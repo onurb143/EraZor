@@ -4,33 +4,32 @@ using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddDbContext<DataContext>(options =>
-        options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-    services.AddControllers();
-}
+// Hent konfigurationen
+var configuration = builder.Configuration;
 
+// Tilføj services til containeren
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))); // Brug konfigurationen korrekt
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Tilføj Swagger support (valgfrit, hvis du bruger Swagger)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Konfigurer HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+

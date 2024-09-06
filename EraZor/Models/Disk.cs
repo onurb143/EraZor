@@ -3,8 +3,9 @@
     public class Disk
     {
         public int DiskId { get; set; }
-        public string Type { get; set; }
+        public string? Type { get; set; }   // Nullable
         public int Capacity { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }   // Nullable
+
     }
 }
