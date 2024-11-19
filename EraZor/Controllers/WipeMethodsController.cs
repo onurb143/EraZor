@@ -14,6 +14,22 @@ public class WipeMethodsController : ControllerBase
         _context = context;
     }
 
+    [HttpGet("test-db-connection")]
+    public async Task<IActionResult> TestDbConnection()
+    {
+        try
+        {
+            var testResult = await _context.WipeMethods.FirstOrDefaultAsync();
+            return Ok("Database connection successful.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Database connection failed: {ex.Message}");
+        }
+    }
+
+
+
     // GET: api/WipeMethods
     [HttpGet]
     public async Task<ActionResult<IEnumerable<WipeMethod>>> GetWipeMethods()

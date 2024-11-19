@@ -22,7 +22,6 @@ public class DataContext : DbContext
         modelBuilder.Entity<WipeMethod>()
             .HasKey(wm => wm.MethodID);
 
-        // Definer andre primærnøgler og relationer her
     }
 
 

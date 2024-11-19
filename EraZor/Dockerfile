@@ -1,30 +1,32 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["EraZor/EraZor.csproj", "EraZor/"]
-RUN dotnet restore "./EraZor/EraZor.csproj"
+
+# Copy project files and restore dependencies
+COPY ["EraZor.csproj", "./"]
+RUN dotnet restore "./EraZor.csproj"
+
+# Copy all files and set the working directory
 COPY . .
-WORKDIR "/src/EraZor"
-RUN dotnet build "./EraZor.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src"
 
-# This stage is used to publish the service project to be copied to the final stage
+# Build the application
+RUN dotnet build "EraZor.csproj" -c Release -o /app/build
+
+# Stage 2: Publish
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./EraZor.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "EraZor.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+# Stage 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+
+# Copy only the published output to the runtime container
 COPY --from=publish /app/publish .
+
+# Expose necessary ports
+EXPOSE 5000
+EXPOSE 5001
+
+# Set the entry point for the container
 ENTRYPOINT ["dotnet", "EraZor.dll"]

@@ -9,7 +9,7 @@ var configuration = builder.Configuration;
 
 // Tilføj services til containeren
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))); // Brug konfigurationen korrekt
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))); 
 
 builder.Services.AddControllers();
 
