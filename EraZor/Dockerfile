@@ -28,5 +28,8 @@ COPY --from=publish /app/publish .
 EXPOSE 5000
 EXPOSE 5001
 
+RUN apt update && apt install -y curl
+
+
 # Set the entry point for the container
 ENTRYPOINT ["dotnet", "EraZor.dll"]

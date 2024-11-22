@@ -17,24 +17,11 @@ public class DisksController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("test-db-connection")]
-    public async Task<IActionResult> TestDbConnection()
-    {
-        try
-        {
-            var testResult = await _context.Disks.FirstOrDefaultAsync();
-            return Ok("Database connection successful.");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Database connection failed: {ex.Message}");
-        }
-    }
-
     // GET: api/Disks
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Disk>>> GetDisks()
     {
+        // Hent alle diske fra databasen
         return await _context.Disks.ToListAsync();
     }
 
@@ -42,6 +29,7 @@ public class DisksController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Disk>> GetDisk(int id)
     {
+        // Hent en specifik disk baseret på ID
         var disk = await _context.Disks.FindAsync(id);
 
         if (disk == null)
@@ -56,17 +44,19 @@ public class DisksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Disk>> PostDisk(Disk disk)
     {
+        // Tilføj en ny disk til databasen
         _context.Disks.Add(disk);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetDisk), new { id = disk.diskID  }, disk);
+        return CreatedAtAction(nameof(GetDisk), new { id = disk.DiskID }, disk);
     }
 
     // PUT: api/Disks/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutDisk(int id, Disk disk)
     {
-        if (id != disk.diskID)
+        // Tjek om ID i URL'en matcher diskens ID
+        if (id != disk.DiskID)
         {
             return BadRequest();
         }
@@ -110,6 +100,6 @@ public class DisksController : ControllerBase
 
     private bool DiskExists(int id)
     {
-        return _context.Disks.Any(e => e.diskID == id);
+        return _context.Disks.Any(e => e.DiskID == id);
     }
 }
