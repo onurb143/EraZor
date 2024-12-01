@@ -15,7 +15,7 @@ namespace EraZor.Models
         public DateTime EndTime { get; set; }
 
         [Column("status")]
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         [Column("diskid")]
         public int DiskId { get; set; }
@@ -27,8 +27,9 @@ namespace EraZor.Models
         public int UserId { get; set; }
 
         // Navigations
-        public Disk Disk { get; set; }
-        public WipeMethod Method { get; set; }
-        public User User { get; set; }
+        public Disk Disk { get; set; } = new Disk();
+        public WipeMethod Method { get; set; } = new WipeMethod();
+        public User User { get; set; } = new User();
+
     }
 }

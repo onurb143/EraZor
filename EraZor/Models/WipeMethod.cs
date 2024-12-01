@@ -7,8 +7,8 @@ namespace EraZor.Models
     {
         [Key] // Denne linje fortæller EF, at MethodID er primærnøglen
         public int MethodID { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public int OverwritePass { get; set; }
     }
 }
