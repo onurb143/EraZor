@@ -3,6 +3,7 @@ using System;
 using EraZor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EraZor.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241204195927_UpdateWipeMethodRelation")]
+    partial class UpdateWipeMethodRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,8 +85,11 @@ namespace EraZor.Migrations
 
             modelBuilder.Entity("EraZor.Models.User", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -100,11 +106,11 @@ namespace EraZor.Migrations
 
             modelBuilder.Entity("EraZor.Models.WipeMethod", b =>
                 {
-                    b.Property<int>("WipeMethodID")
+                    b.Property<int>("MethodID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WipeMethodID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MethodID"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -117,7 +123,7 @@ namespace EraZor.Migrations
                     b.Property<int>("OverwritePass")
                         .HasColumnType("integer");
 
-                    b.HasKey("WipeMethodID");
+                    b.HasKey("MethodID");
 
                     b.ToTable("WipeMethods");
                 });
@@ -143,9 +149,8 @@ namespace EraZor.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("WipeMethodId")
                         .HasColumnType("integer");
@@ -175,13 +180,13 @@ namespace EraZor.Migrations
             modelBuilder.Entity("WipeJob", b =>
                 {
                     b.HasOne("EraZor.Models.Disk", "Disk")
-                        .WithMany("WipeJobs")
+                        .WithMany()
                         .HasForeignKey("DiskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EraZor.Models.User", "User")
-                        .WithMany("WipeJobs")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -197,16 +202,6 @@ namespace EraZor.Migrations
                     b.Navigation("User");
 
                     b.Navigation("WipeMethod");
-                });
-
-            modelBuilder.Entity("EraZor.Models.Disk", b =>
-                {
-                    b.Navigation("WipeJobs");
-                });
-
-            modelBuilder.Entity("EraZor.Models.User", b =>
-                {
-                    b.Navigation("WipeJobs");
                 });
 
             modelBuilder.Entity("EraZor.Models.WipeMethod", b =>

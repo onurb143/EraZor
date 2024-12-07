@@ -25,5 +25,7 @@ namespace EraZor.Models
 
       
         public string? Manufacturer { get; set; }
+
+        public ICollection<WipeJob> WipeJobs { get; set; } = new List<WipeJob>();
     }
 }

@@ -42,14 +42,14 @@ public class WipeMethodsController : ControllerBase
         _context.WipeMethods.Add(wipeMethod);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetWipeMethod), new { id = wipeMethod.MethodID }, wipeMethod);
+        return CreatedAtAction(nameof(GetWipeMethod), new { id = wipeMethod.WipeMethodID }, wipeMethod);
     }
 
     // PUT: api/WipeMethods/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutWipeMethod(int id, WipeMethod wipeMethod)
     {
-        if (id != wipeMethod.MethodID)
+        if (id != wipeMethod.WipeMethodID)
         {
             return BadRequest();
         }
@@ -93,6 +93,6 @@ public class WipeMethodsController : ControllerBase
 
     private bool WipeMethodExists(int id)
     {
-        return _context.WipeMethods.Any(e => e.MethodID == id);
+        return _context.WipeMethods.Any(e => e.WipeMethodID == id);
     }
 }

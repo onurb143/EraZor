@@ -16,13 +16,34 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<LogEntry>()
-            .HasKey(le => le.LogID);
+        base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<WipeMethod>()
-            .HasKey(wm => wm.MethodID);
+        // Relation mellem WipeJob og WipeMethod
+        modelBuilder.Entity<WipeJob>()
+            .HasOne(wj => wj.WipeMethod)
+            .WithMany(wm => wm.WipeJobs)
+            .HasForeignKey(wj => wj.WipeMethodId);
 
+        // Relation mellem WipeJob og LogEntry
+        modelBuilder.Entity<WipeJob>()
+            .HasMany(wj => wj.LogEntries)
+            .WithOne(le => le.WipeJob)
+            .HasForeignKey(le => le.WipeJobId);
+
+        // Relation mellem WipeJob og User
+        modelBuilder.Entity<WipeJob>()
+            .HasOne(wj => wj.User)
+            .WithMany(u => u.WipeJobs)
+            .HasForeignKey(wj => wj.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Relation mellem WipeJob og Disk
+        modelBuilder.Entity<WipeJob>()
+            .HasOne(wj => wj.Disk)
+            .WithMany(d => d.WipeJobs)
+            .HasForeignKey(wj => wj.DiskId);
     }
+
 
 
 }

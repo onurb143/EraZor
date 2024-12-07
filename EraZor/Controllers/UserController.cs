@@ -25,9 +25,8 @@ namespace EraZor.Controllers
             return Ok(users); // Returner data som JSON
         }
 
-        // GET: api/User/5
         [HttpGet("{id}")]
-        public IActionResult GetUserById(int id)
+        public IActionResult GetUserById(string id) // Skift til string
         {
             var user = _context.Users.FirstOrDefault(u => u.UserId == id);
             if (user == null)
@@ -37,22 +36,8 @@ namespace EraZor.Controllers
             return Ok(user); // Returner data som JSON
         }
 
-        // POST: api/User
-        [HttpPost]
-        public IActionResult CreateUser([FromBody] User user)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Users.Add(user);
-                _context.SaveChanges();
-                return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
-            }
-            return BadRequest(ModelState); // Returner 400, hvis data er ugyldige
-        }
-
-        // PUT: api/User/5
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, [FromBody] User user)
+        public IActionResult UpdateUser(string id, [FromBody] User user) // Skift til string
         {
             if (id != user.UserId)
             {
@@ -73,9 +58,8 @@ namespace EraZor.Controllers
             return BadRequest(ModelState);
         }
 
-        // DELETE: api/User/5
         [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id)
+        public IActionResult DeleteUser(string id) // Skift til string
         {
             var user = _context.Users.FirstOrDefault(u => u.UserId == id);
             if (user == null)
@@ -87,5 +71,6 @@ namespace EraZor.Controllers
             _context.SaveChanges();
             return NoContent();
         }
+
     }
 }

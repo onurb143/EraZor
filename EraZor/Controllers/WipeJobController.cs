@@ -59,7 +59,7 @@ namespace EraZor.Controllers
             existingJob.EndTime = updatedWipeJob.EndTime;
             existingJob.Status = updatedWipeJob.Status;
             existingJob.DiskId = updatedWipeJob.DiskId;
-            existingJob.MethodId = updatedWipeJob.MethodId;
+            existingJob.WipeMethodId = updatedWipeJob.WipeMethodId;
             existingJob.UserId = updatedWipeJob.UserId;
 
             _context.SaveChanges();

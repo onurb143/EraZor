@@ -1,35 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using EraZor.Models;
 
-namespace EraZor.Models
+public class WipeJob
 {
-    [Table("wipejob")]
-    public class WipeJob
-    {
-        [Column("wipejobid")]
-        public int WipeJobId { get; set; }
+    public int WipeJobId { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public string Status { get; set; }
 
-        [Column("starttime")]
-        public DateTime StartTime { get; set; }
+    public int DiskId { get; set; }
+    public Disk Disk { get; set; }
 
-        [Column("endtime")]
-        public DateTime EndTime { get; set; }
+    public string UserId { get; set; }
+    public User User { get; set; }
 
-        [Column("status")]
-        public string Status { get; set; } = string.Empty;
+    public int WipeMethodId { get; set; }
+    public WipeMethod WipeMethod { get; set; }
 
-        [Column("diskid")]
-        public int DiskId { get; set; }
-
-        [Column("methodid")]
-        public int MethodId { get; set; }
-
-        [Column("userid")]
-        public int UserId { get; set; }
-
-        // Navigations
-        public Disk Disk { get; set; } = new Disk();
-        public WipeMethod Method { get; set; } = new WipeMethod();
-        public User User { get; set; } = new User();
-
-    }
+    // Navigationsproperty for LogEntries
+    public ICollection<LogEntry> LogEntries { get; set; } = new List<LogEntry>();
 }
+
