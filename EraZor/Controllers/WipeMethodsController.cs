@@ -35,6 +35,9 @@ public class WipeMethodsController : ControllerBase
         return wipeMethod;
     }
 
+
+
+
     // POST: api/WipeMethods
     [HttpPost]
     public async Task<ActionResult<WipeMethod>> PostWipeMethod(WipeMethod wipeMethod)

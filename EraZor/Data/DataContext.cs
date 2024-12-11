@@ -12,7 +12,7 @@ public class DataContext : DbContext
     public DbSet<WipeJob> WipeJobs { get; set; }
     public DbSet<Disk> Disks { get; set; }
     public DbSet<WipeMethod> WipeMethods { get; set; }
-    public DbSet<User> Users { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,10 +32,11 @@ public class DataContext : DbContext
 
         // Relation mellem WipeJob og User
         modelBuilder.Entity<WipeJob>()
-            .HasOne(wj => wj.User)
-            .WithMany(u => u.WipeJobs)
-            .HasForeignKey(wj => wj.UserId)
+            .HasOne(w => w.User)
+            .WithMany() // Ingen navigation i IdentityUser
+            .HasForeignKey(w => w.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
 
         // Relation mellem WipeJob og Disk
         modelBuilder.Entity<WipeJob>()

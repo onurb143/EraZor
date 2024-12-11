@@ -1,4 +1,5 @@
 ﻿using EraZor.Models;
+using Microsoft.AspNetCore.Identity;
 
 public class WipeJob
 {
@@ -6,17 +7,16 @@ public class WipeJob
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public string Status { get; set; }
-
     public int DiskId { get; set; }
-    public Disk Disk { get; set; }
-
-    public string UserId { get; set; }
-    public User User { get; set; }
-
+    public int MethodId { get; set; }
     public int WipeMethodId { get; set; }
-    public WipeMethod WipeMethod { get; set; }
+    public string UserId { get; set; } // Fremmednøgle
 
-    // Navigationsproperty for LogEntries
-    public ICollection<LogEntry> LogEntries { get; set; } = new List<LogEntry>();
+    public Disk Disk { get; set; }
+    public WipeMethod WipeMethod { get; set; }
+    public ICollection<LogEntry> LogEntries { get; set; }
+
+    // Navigation property til IdentityUser
+    public IdentityUser User { get; set; }
 }
 
