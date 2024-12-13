@@ -1,0 +1,54 @@
+
+services:
+  api:
+    build:
+      context: ./EraZor/EraZor
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:5002"
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+    volumes:
+      - ./Logs:/app/logs
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  web:
+    build:
+      context: ./WebKlient/WebKlient
+      dockerfile: Dockerfile
+    ports:
+      - "5189:5189"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:5189"
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Test1234!
+      POSTGRES_DB: DatamatikerDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    external: true
