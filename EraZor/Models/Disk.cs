@@ -1,30 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EraZor.Models
 {
-
     public class Disk
     {
-
+        [Key]
         public int DiskID { get; set; }
 
-
+        [Required]
+        [MaxLength(50)]
         public string Type { get; set; } = string.Empty;
 
-
+        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0.")]
         public int Capacity { get; set; }
 
-
-        public string Status { get; set; } = string.Empty;
-
-
+        [MaxLength(200)]
         public string? Path { get; set; }
 
-  
+        [MaxLength(100)]
         public string? SerialNumber { get; set; }
 
-      
+        [MaxLength(100)]
         public string? Manufacturer { get; set; }
+
 
         public ICollection<WipeJob> WipeJobs { get; set; } = new List<WipeJob>();
     }

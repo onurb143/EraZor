@@ -1,8 +1,8 @@
 ﻿namespace EraZor.Data;
 using EraZor.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-
 
 public class DataContext : DbContext
 {
@@ -12,7 +12,7 @@ public class DataContext : DbContext
     public DbSet<WipeJob> WipeJobs { get; set; }
     public DbSet<Disk> Disks { get; set; }
     public DbSet<WipeMethod> WipeMethods { get; set; }
-
+    public DbSet<IdentityUser> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,14 +37,10 @@ public class DataContext : DbContext
             .HasForeignKey(w => w.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-
         // Relation mellem WipeJob og Disk
         modelBuilder.Entity<WipeJob>()
             .HasOne(wj => wj.Disk)
             .WithMany(d => d.WipeJobs)
             .HasForeignKey(wj => wj.DiskId);
     }
-
-
-
 }

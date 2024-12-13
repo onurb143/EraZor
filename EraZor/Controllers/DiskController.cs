@@ -44,12 +44,34 @@ public class DisksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Disk>> PostDisk(Disk disk)
     {
-        // Tilføj en ny disk til databasen
-        _context.Disks.Add(disk);
-        await _context.SaveChangesAsync();
+        try
+        {
+            // Tjek for dubletter baseret på SerialNumber
+            if (_context.Disks.Any(d => d.SerialNumber == disk.SerialNumber))
+            {
+                return Conflict(new { message = "A disk with the same SerialNumber already exists." });
+            }
 
-        return CreatedAtAction(nameof(GetDisk), new { id = disk.DiskID }, disk);
+            // Validering: Tjek for obligatoriske felter
+            if (string.IsNullOrWhiteSpace(disk.SerialNumber) || string.IsNullOrWhiteSpace(disk.Type) || disk.Capacity <= 0)
+            {
+                return BadRequest(new { message = "Invalid disk data. Please provide valid SerialNumber, Type, and Capacity." });
+            }
+
+            // Tilføj en ny disk til databasen
+            _context.Disks.Add(disk);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetDisk), new { id = disk.DiskID }, disk);
+        }
+        catch (Exception ex)
+        {
+            // Returner en generel fejlbesked
+            return StatusCode(500, new { message = "An error occurred while saving the disk.", details = ex.Message });
+        }
     }
+
+
 
     // PUT: api/Disks/5
     [HttpPut("{id}")]
