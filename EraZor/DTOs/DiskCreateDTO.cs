@@ -1,17 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
-namespace EraZor.Models
+namespace EraZor.DTOs
 {
-    public class Disk
+    public class DiskCreateDto
     {
-        [Key]
-        public int DiskID { get; set; }
-
         [Required]
         [MaxLength(50)]
-        public string Type { get; set; } = string.Empty;
+        public string Type { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0.")]
         public int Capacity { get; set; }
@@ -19,14 +14,13 @@ namespace EraZor.Models
         [MaxLength(200)]
         public string? Path { get; set; }
 
+        [Required]
         [MaxLength(100)]
         public string? SerialNumber { get; set; }
 
         [MaxLength(100)]
         public string? Manufacturer { get; set; }
-
-        [JsonIgnore] // Undgå serialization af WipeJobs i JSON
-        public ICollection<WipeJob> WipeJobs { get; set; } = new List<WipeJob>();
-
     }
+
+
 }

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EraZor.Data; // Din DbContext
-using EraZor.Models; // Din WipeJob-model
+using EraZor.Data;          // Din DbContext
+using EraZor.Models;        // Din WipeJob-model
+using EraZor.DTOs;          // DTO
 using System.Linq;
 
 namespace EraZor.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] // Definerer ruten som /api/WipeJob
+    [Route("api/[controller]")]
     public class WipeJobController : ControllerBase
     {
         private readonly DataContext _context;
@@ -16,15 +17,13 @@ namespace EraZor.Controllers
             _context = context;
         }
 
-        // GET: api/WipeJob
         [HttpGet]
         public IActionResult GetAllWipeJobs()
         {
-            var jobs = _context.WipeJobs.ToList(); // Hent alle wipe jobs
+            var jobs = _context.WipeJobs.ToList();
             return Ok(jobs);
         }
 
-        // GET: api/WipeJob/{id}
         [HttpGet("{id}")]
         public IActionResult GetWipeJobById(int id)
         {
@@ -34,25 +33,35 @@ namespace EraZor.Controllers
             return Ok(job);
         }
 
-        // POST: api/WipeJob
         [HttpPost]
-        public IActionResult CreateWipeJob([FromBody] WipeJob wipeJob)
+        public async Task<IActionResult> CreateWipeJob([FromBody] WipeJobCreateDto dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (dto.StartTime.Kind != DateTimeKind.Utc || dto.EndTime.Kind != DateTimeKind.Utc)
+            {
+                return BadRequest("StartTime and EndTime must be in UTC format.");
+            }
+
+            var wipeJob = new WipeJob
+            {
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
+                Status = dto.Status,
+                DiskId = dto.DiskId,
+                WipeMethodId = dto.WipeMethodId
+            };
 
             _context.WipeJobs.Add(wipeJob);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetWipeJobById), new { id = wipeJob.WipeJobId }, wipeJob);
         }
 
-        // PUT: api/WipeJob/{id}
         [HttpPut("{id}")]
-        public IActionResult UpdateWipeJob(int id, [FromBody] WipeJob updatedWipeJob)
+        public async Task<IActionResult> UpdateWipeJob(int id, [FromBody] WipeJob updatedWipeJob)
         {
             if (id != updatedWipeJob.WipeJobId) return BadRequest("ID mismatch.");
 
-            var existingJob = _context.WipeJobs.FirstOrDefault(w => w.WipeJobId == id);
+            var existingJob = await _context.WipeJobs.FindAsync(id);
             if (existingJob == null) return NotFound();
 
             existingJob.StartTime = updatedWipeJob.StartTime;
@@ -60,22 +69,20 @@ namespace EraZor.Controllers
             existingJob.Status = updatedWipeJob.Status;
             existingJob.DiskId = updatedWipeJob.DiskId;
             existingJob.WipeMethodId = updatedWipeJob.WipeMethodId;
-            existingJob.UserId = updatedWipeJob.UserId;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // DELETE: api/WipeJob/{id}
         [HttpDelete("{id}")]
-        public IActionResult DeleteWipeJob(int id)
+        public async Task<IActionResult> DeleteWipeJob(int id)
         {
-            var job = _context.WipeJobs.FirstOrDefault(w => w.WipeJobId == id);
+            var job = await _context.WipeJobs.FindAsync(id);
             if (job == null) return NotFound();
 
             _context.WipeJobs.Remove(job);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

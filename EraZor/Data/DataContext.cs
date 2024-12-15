@@ -13,10 +13,17 @@ public class DataContext : DbContext
     public DbSet<Disk> Disks { get; set; }
     public DbSet<WipeMethod> WipeMethods { get; set; }
     public DbSet<IdentityUser> Users { get; set; }
+    public DbSet<WipeReport> WipeReports { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<WipeReport>()
+            .HasOne(wr => wr.WipeJob)
+            .WithMany(wj => wj.WipeReports)
+            .HasForeignKey(wr => wr.WipeJobId)
+            .OnDelete(DeleteBehavior.Cascade); // Eller et andet DeleteBehavior afhængigt af dine krav
+
 
         // Relation mellem WipeJob og WipeMethod
         modelBuilder.Entity<WipeJob>()
@@ -30,14 +37,16 @@ public class DataContext : DbContext
             .WithOne(le => le.WipeJob)
             .HasForeignKey(le => le.WipeJobId);
 
-        // Relation mellem WipeJob og User
+        /* Relation mellem WipeJob og User
         modelBuilder.Entity<WipeJob>()
             .HasOne(w => w.User)
             .WithMany() // Ingen navigation i IdentityUser
             .HasForeignKey(w => w.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
+        */
         // Relation mellem WipeJob og Disk
+
+
         modelBuilder.Entity<WipeJob>()
             .HasOne(wj => wj.Disk)
             .WithMany(d => d.WipeJobs)

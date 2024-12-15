@@ -3,6 +3,7 @@ using System;
 using EraZor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EraZor.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241214151736_UpdateWipeReportAndWipeJob")]
+    partial class UpdateWipeReportAndWipeJob
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,9 +109,11 @@ namespace EraZor.Migrations
 
             modelBuilder.Entity("EraZor.Models.WipeReport", b =>
                 {
-                    b.Property<int?>("WipeJobId")
+                    b.Property<int>("ReportId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReportId"));
 
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
@@ -136,13 +141,18 @@ namespace EraZor.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("text");
 
+                    b.Property<int>("WipeJobId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("WipeMethodName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("WipeJobId");
+                    b.HasKey("ReportId");
 
-                    b.ToTable("WipeReports");
+                    b.HasIndex("WipeJobId");
+
+                    b.ToTable("WipeReport");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>

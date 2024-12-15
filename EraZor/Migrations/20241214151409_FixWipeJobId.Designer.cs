@@ -3,6 +3,7 @@ using System;
 using EraZor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EraZor.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241214151409_FixWipeJobId")]
+    partial class FixWipeJobId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,47 +107,6 @@ namespace EraZor.Migrations
                     b.ToTable("WipeMethods");
                 });
 
-            modelBuilder.Entity("EraZor.Models.WipeReport", b =>
-                {
-                    b.Property<int?>("WipeJobId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Capacity")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("DiskType")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Manufacturer")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("OverwritePasses")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SerialNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("text");
-
-                    b.Property<string>("WipeMethodName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("WipeJobId");
-
-                    b.ToTable("WipeReports");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
                 {
                     b.Property<string>("Id")
@@ -230,21 +192,60 @@ namespace EraZor.Migrations
                     b.ToTable("WipeJobs");
                 });
 
+            modelBuilder.Entity("WipeReport", b =>
+                {
+                    b.Property<int>("WipeJobId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WipeJobId"));
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DiskType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Manufacturer")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OverwritePasses")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("WipeJobId1")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("WipeMethodName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("WipeJobId");
+
+                    b.HasIndex("WipeJobId1");
+
+                    b.ToTable("WipeReport");
+                });
+
             modelBuilder.Entity("EraZor.Models.LogEntry", b =>
                 {
                     b.HasOne("WipeJob", "WipeJob")
                         .WithMany("LogEntries")
-                        .HasForeignKey("WipeJobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WipeJob");
-                });
-
-            modelBuilder.Entity("EraZor.Models.WipeReport", b =>
-                {
-                    b.HasOne("WipeJob", "WipeJob")
-                        .WithMany("WipeReports")
                         .HasForeignKey("WipeJobId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -269,6 +270,17 @@ namespace EraZor.Migrations
                     b.Navigation("Disk");
 
                     b.Navigation("WipeMethod");
+                });
+
+            modelBuilder.Entity("WipeReport", b =>
+                {
+                    b.HasOne("WipeJob", "WipeJob")
+                        .WithMany("WipeReports")
+                        .HasForeignKey("WipeJobId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WipeJob");
                 });
 
             modelBuilder.Entity("EraZor.Models.Disk", b =>
