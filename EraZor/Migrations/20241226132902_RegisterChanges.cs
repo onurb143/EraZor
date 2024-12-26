@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace EraZor.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class RegisterChanges : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,46 +18,33 @@ namespace EraZor.Migrations
                 name: "Disks",
                 columns: table => new
                 {
-                    DiskId = table.Column<int>(type: "integer", nullable: false)
+                    DiskID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Type = table.Column<string>(type: "text", nullable: true),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: true)
+                    Path = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    SerialNumber = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Manufacturer = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Disks", x => x.DiskId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Username = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_Disks", x => x.DiskID);
                 });
 
             migrationBuilder.CreateTable(
                 name: "WipeMethods",
                 columns: table => new
                 {
-                    MethodID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    OverwritePass = table.Column<int>(nullable: false)
+                    WipeMethodID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    OverwritePass = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WipeMethods", x => x.MethodID);
+                    table.PrimaryKey("PK_WipeMethods", x => x.WipeMethodID);
                 });
-
 
             migrationBuilder.CreateTable(
                 name: "WipeJobs",
@@ -65,10 +54,9 @@ namespace EraZor.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     DiskId = table.Column<int>(type: "integer", nullable: false),
-                    MethodId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    WipeMethodId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,19 +65,13 @@ namespace EraZor.Migrations
                         name: "FK_WipeJobs_Disks_DiskId",
                         column: x => x.DiskId,
                         principalTable: "Disks",
-                        principalColumn: "DiskId",
+                        principalColumn: "DiskID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WipeJobs_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_WipeJobs_WipeMethods_MethodId",
-                        column: x => x.MethodId,
+                        name: "FK_WipeJobs_WipeMethods_WipeMethodId",
+                        column: x => x.WipeMethodId,
                         principalTable: "WipeMethods",
-                        principalColumn: "MethodID",
+                        principalColumn: "WipeMethodID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -100,8 +82,7 @@ namespace EraZor.Migrations
                     LogID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: false),
-                    JobID = table.Column<int>(type: "integer", nullable: false),
+                    Message = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     WipeJobId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -115,6 +96,30 @@ namespace EraZor.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "WipeMethods",
+                columns: new[] { "WipeMethodID", "Description", "Name", "OverwritePass" },
+                values: new object[,]
+                {
+                    { 1, "", "DoD 5220.22-M", 3 },
+                    { 2, "", "NIST 800-88 Clear", 1 },
+                    { 3, "", "NIST 800-88 Purge", 1 },
+                    { 4, "", "Gutmann", 35 },
+                    { 5, "", "Random Data", 1 },
+                    { 6, "", "Write Zero", 1 },
+                    { 7, "", "Write One", 1 },
+                    { 8, "", "Schneider", 7 },
+                    { 9, "", "Bruce Force", 10 },
+                    { 10, "", "Quick Format", 1 },
+                    { 11, "", "Full Format", 1 }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Disks_SerialNumber",
+                table: "Disks",
+                column: "SerialNumber",
+                unique: true);
+
             migrationBuilder.CreateIndex(
                 name: "IX_LogEntries_WipeJobId",
                 table: "LogEntries",
@@ -126,14 +131,9 @@ namespace EraZor.Migrations
                 column: "DiskId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WipeJobs_MethodId",
+                name: "IX_WipeJobs_WipeMethodId",
                 table: "WipeJobs",
-                column: "MethodId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WipeJobs_UserId",
-                table: "WipeJobs",
-                column: "UserId");
+                column: "WipeMethodId");
         }
 
         /// <inheritdoc />
@@ -147,9 +147,6 @@ namespace EraZor.Migrations
 
             migrationBuilder.DropTable(
                 name: "Disks");
-
-            migrationBuilder.DropTable(
-                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "WipeMethods");

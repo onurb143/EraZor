@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EraZor.Models
@@ -11,7 +10,8 @@ namespace EraZor.Models
 
         public DateTime Timestamp { get; set; }
 
-        public string Message { get; set; }
+        [MaxLength(500)] // Eksempel
+        public string? Message { get; set; }
 
         [ForeignKey("WipeJob")]
         public int WipeJobId { get; set; } // Fremmednøgle til WipeJob

@@ -13,7 +13,11 @@ public class WipeJob
 
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public string Status { get; set; }
+
+
+    [MaxLength(50)]
+    public string? Status { get; set; }
+
     public int DiskId { get; set; }
     public int WipeMethodId { get; set; }
 
@@ -25,8 +29,6 @@ public class WipeJob
     [ForeignKey("WipeMethodId")]
     [JsonIgnore] // Forhindrer cyklus under serialisering
     public virtual WipeMethod WipeMethod { get; set; }
-
-    public virtual ICollection<WipeReport> WipeReports { get; set; } // Relation til WipeReports
 
     public ICollection<LogEntry> LogEntries { get; set; } = new List<LogEntry>();
 }

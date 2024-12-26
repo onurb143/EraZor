@@ -1,33 +1,26 @@
-# Brug den officielle ASP.NET Core-runtime som base
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
-EXPOSE 5002
-EXPOSE 5003
 
-# Brug SDK-billedet til at bygge applikationen
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+# Kopier csproj og gendan afh�ngigheder
+COPY EraZor.csproj .
+RUN dotnet restore EraZor.csproj
 
-# Kopiér projektfil og udfør restore
-COPY ["EraZor.csproj", "./"]
-RUN dotnet restore "EraZor.csproj"
-
-# Kopiér resten af applikationen
+# Kopier resten af koden og byg applikationen
 COPY . .
-RUN dotnet build -c Release -o /app/build
+RUN dotnet publish -c Release -o /publish --property:GenerateStaticWebAssets=true
 
-# Publicer applikationen
-FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
-
-# Brug runtime-billedet til at køre applikationen
-FROM base AS final
+# Stage 2: Migrations
+FROM build AS migrations
 WORKDIR /app
-COPY --from=publish /app/publish .
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
 
+# K�r migrations
+RUN dotnet ef database update
+
+# Stage 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /publish .
 ENTRYPOINT ["dotnet", "EraZor.dll"]
-
-
-
-
-

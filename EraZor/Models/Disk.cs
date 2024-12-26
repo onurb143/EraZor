@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace EraZor.Models
@@ -27,6 +26,5 @@ namespace EraZor.Models
 
         [JsonIgnore] // Undgå serialization af WipeJobs i JSON
         public ICollection<WipeJob> WipeJobs { get; set; } = new List<WipeJob>();
-
     }
 }

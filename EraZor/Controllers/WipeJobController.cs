@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using EraZor.Data;          // Din DbContext
 using EraZor.Models;        // Din WipeJob-model
 using EraZor.DTOs;          // DTO
@@ -88,3 +88,4 @@ namespace EraZor.Controllers
         }
     }
 }
+*/

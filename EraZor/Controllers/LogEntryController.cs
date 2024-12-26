@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using EraZor.Data; // Din DbContext
 using EraZor.Models; // Din LogEntry-model
 using System.Linq;
@@ -86,3 +86,4 @@ namespace EraZor.Controllers
         }
     }
 }
+*/

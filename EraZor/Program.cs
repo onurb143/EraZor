@@ -1,73 +1,104 @@
 using EraZor.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Hent konfiguration
-var configuration = builder.Configuration;
-
-// Konfigurer Kestrel til kun HTTP
+// Konfigurer Kestrel-server (HTTP og HTTPS)
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5002); // HTTP
+    if (!builder.Environment.IsDevelopment())
+    {
+        options.ListenAnyIP(5003, listenOptions => listenOptions.UseHttps()); // HTTPS for produktion
+    }
 });
 
-// Tilføj services til containeren
+// Konfigurer database
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers(); // Tilføj controllers
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Tilføj Swagger-support
+// Konfigurer ASP.NET Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+})
+    .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultTokenProviders();
 
-// Konfigurer CORS-politik
+// Tilføj dynamisk CORS-konfiguration
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5189" };
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
 });
 
-// Tilføj logging
+// Tilføj controllers og Swagger
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 var app = builder.Build();
 
 // Middleware
-app.UseCors("AllowAll"); // Anvend CORS-politikken
+app.UseCors("AllowSpecificOrigins");
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthorization();
 
-// Kortlæg kontroller
 app.MapControllers();
 
-// Konfigurer HTTP request pipeline (kun i udvikling)
+// Swagger konfiguration
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation");
-        c.RoutePrefix = string.Empty; // Dette sætter Swagger som default route
+        c.RoutePrefix = string.Empty;
+    });
+}
+else
+{
+    // Begræns Swagger-adgang i produktion
+    app.UseSwagger(c => c.RouteTemplate = "/admin/swagger/{documentName}/swagger.json");
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/admin/swagger/v1/swagger.json", "API Documentation");
     });
 }
 
-using (var connection = new Npgsql.NpgsqlConnection("Host=db;Port=5432;Database=DatamatikerDB;Username=postgres;Password=Test1234!"))
+// Test og migrer database
+using (var scope = app.Services.CreateScope())
 {
+    var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
     try
     {
-        connection.Open();
-        Console.WriteLine("Database connected successfully!");
+        // Brug migrationer i stedet for EnsureCreated
+        dbContext.Database.Migrate();
+        Console.WriteLine("Database connected and migrations applied successfully!");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Failed to connect: {ex.Message}");
+        Console.Error.WriteLine($"Database connection or migration failed: {ex}");
+        Environment.Exit(1); // Luk applikationen, hvis databasen ikke er tilgængelig
     }
 }
 
-
+// Start applikationen
 app.Run();
