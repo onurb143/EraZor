@@ -10,17 +10,20 @@ RUN dotnet restore EraZor.csproj
 COPY . .
 RUN dotnet publish -c Release -o /publish --property:GenerateStaticWebAssets=true
 
-# Stage 2: Migrations
-FROM build AS migrations
+# Stage 2: Runtime (inkluderer værktøjer og SDK)
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS runtime
 WORKDIR /app
-RUN dotnet tool install --global dotnet-ef
+
+# Kopier publicerede filer fra build-stagen
+COPY --from=build /publish .
+
+# Kopier projektfilerne for EF-kommandosupport
+COPY EraZor.csproj .
+
+# Installer netværksværktøjer og dotnet-ef
+RUN apt-get update && apt-get install -y iputils-ping && \
+    dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-# Kør migrations
-RUN dotnet ef database update
-
-# Stage 3: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
-WORKDIR /app
-COPY --from=build /publish .
+# Start applikationen
 ENTRYPOINT ["dotnet", "EraZor.dll"]
