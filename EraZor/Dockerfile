@@ -17,6 +17,10 @@ WORKDIR /app
 # Kopier publicerede filer fra build-stagen
 COPY --from=build /publish .
 
+# Kopier certifikatet til containeren
+COPY https/aspnetapp.pfx /app/https/
+
+
 # Kopier projektfilerne for EF-kommandosupport
 COPY EraZor.csproj .
 
