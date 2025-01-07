@@ -5,17 +5,20 @@ namespace EraZor.Models
 {
     public class LogEntry
     {
-        [Key]
+        [Key] // Primær nøgle
         public int LogID { get; set; }
 
         public DateTime Timestamp { get; set; }
 
-        [MaxLength(500)] // Eksempel
+        [MaxLength(500)]
         public string? Message { get; set; }
 
         [ForeignKey("WipeJob")]
         public int WipeJobId { get; set; } // Fremmednøgle til WipeJob
 
-        public WipeJob WipeJob { get; set; }
+        public required WipeJob WipeJob { get; set; }
     }
 }
+
+
+

@@ -11,7 +11,7 @@ namespace EraZor.Models
         public int WipeMethodID { get; set; }
 
         [Required] // Feltet er påkrævet
-        [MaxLength(100)] // Sætter en maksimal længde for navn
+        [MaxLength(30)] // Sætter en maksimal længde for navn
         public string Name { get; set; } = string.Empty;
 
         [MaxLength(500)] // Beskrivelse kan være længere, men vi sætter en grænse

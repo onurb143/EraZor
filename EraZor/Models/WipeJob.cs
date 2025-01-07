@@ -9,7 +9,7 @@ public class WipeJob
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int WipeJobId { get; set; }  // Primær nøgle, auto-genereret
+    public int WipeJobId { get; set; }  // Primær nøgle
 
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
@@ -28,7 +28,7 @@ public class WipeJob
 
     [ForeignKey("WipeMethodId")]
     [JsonIgnore] // Forhindrer cyklus under serialisering
-    public virtual WipeMethod WipeMethod { get; set; }
+    public virtual WipeMethod? WipeMethod { get; set; }
 
     public ICollection<LogEntry> LogEntries { get; set; } = new List<LogEntry>();
 }

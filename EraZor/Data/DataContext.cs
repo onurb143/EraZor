@@ -1,15 +1,16 @@
-﻿namespace EraZor.Data;
-
-using EraZor.Models;
+﻿using EraZor.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
+
+namespace EraZor.Data;
 
 public class DataContext : IdentityDbContext<IdentityUser>
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-    // Dine eksisterende DbSets
+    // Kortlægning af modeller til databasetabeller
     public DbSet<LogEntry> LogEntries { get; set; }
     public DbSet<WipeJob> WipeJobs { get; set; }
     public DbSet<Disk> Disks { get; set; }
@@ -18,7 +19,7 @@ public class DataContext : IdentityDbContext<IdentityUser>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Vigtigt: Behold denne for at sikre, at Identity fungerer
+        // Sikrer at Identity fungerer
         base.OnModelCreating(modelBuilder);
 
         // Custom konfiguration for WipeReports (uden primær nøgle)
@@ -64,3 +65,6 @@ public class DataContext : IdentityDbContext<IdentityUser>
         );
     }
 }
+
+
+
