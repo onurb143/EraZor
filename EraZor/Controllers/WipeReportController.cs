@@ -21,7 +21,7 @@ namespace EraZor.Controllers
         }
 
         // GET: api/WipeReports
-        [Authorize]
+        
         [HttpGet]
         public async Task<IActionResult> GetWipeReports()
         {

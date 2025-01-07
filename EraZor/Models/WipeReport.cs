@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EraZor.Models
 {
@@ -18,5 +19,12 @@ namespace EraZor.Models
 
         [JsonIgnore]
         public virtual WipeJob WipeJob { get; set; }  // Navigation property
+
+        // Fremmed nøgle til IdentityUser
+        [ForeignKey("UserId")]
+        public string? UserId { get; set; }
+
+        // Navigation property til IdentityUser
+        public virtual IdentityUser? User { get; set; }
     }
 }

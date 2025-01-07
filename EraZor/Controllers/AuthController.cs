@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace WebKlient.Controllers
 {
@@ -41,53 +42,52 @@ namespace WebKlient.Controllers
             return Ok(new { token });
         }
 
+
         private string GenerateJwtToken(IdentityUser user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
 
-            // Debugging logs
-            Console.WriteLine($"Issuer: {jwtSettings["Issuer"]}");
-            Console.WriteLine($"Secret: {jwtSettings["Secret"]}");
-
-            // Validate Secret
             var secret = jwtSettings["Secret"];
             if (string.IsNullOrEmpty(secret))
             {
                 throw new InvalidOperationException("JWT Secret is missing in configuration.");
             }
 
-            // Validate Audience
+            var issuer = jwtSettings["Issuer"];
+            if (string.IsNullOrEmpty(issuer))
+            {
+                throw new InvalidOperationException("JWT Issuer is missing in configuration.");
+            }
+
             var audienceSection = jwtSettings.GetSection("Audience").Get<string[]>();
             if (audienceSection == null || audienceSection.Length == 0)
             {
                 throw new InvalidOperationException("JWT Audience is missing in configuration.");
             }
 
-            // Prepare key and credentials
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // Define claims
             var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("roles", string.Join(",", _userManager.GetRolesAsync(user).Result)) // Include user roles
+            };
 
-            // Create the token
+            var expiresInMinutes = int.TryParse(jwtSettings["ExpiresInMinutes"], out var expires) ? expires : 60;
+
             var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: audienceSection[0], // Ensure there is at least one audience
+                issuer: issuer,
+                audience: audienceSection[0],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiresInMinutes"] ?? "60")),
+                expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
     }
 
     public class LoginModel
