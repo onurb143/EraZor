@@ -1,4 +1,6 @@
 ﻿using EraZor.Data;
+using EraZor.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebKlient.DTO_s;
@@ -17,7 +19,7 @@ namespace EraZor.Controllers
         }
 
         // GET: api/WipeReports
-        
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetWipeReports()
         {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EraZor.Models
+namespace EraZor.Model
 {
     public class LogEntry
     {
@@ -16,7 +16,7 @@ namespace EraZor.Models
         [ForeignKey("WipeJob")]
         public int WipeJobId { get; set; } // Fremmednøgle til WipeJob
 
-        public required WipeJob WipeJob { get; set; }
+        public WipeJob WipeJob { get; set; }
     }
 }
 

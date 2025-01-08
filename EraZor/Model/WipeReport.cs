@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 
-namespace EraZor.Models
+namespace EraZor.Model
 {
     public class WipeReport
     {
@@ -14,12 +13,12 @@ namespace EraZor.Models
         public string? Status { get; set; }
         public string? DiskType { get; set; }
         public int Capacity { get; set; }
-        [Required] 
-        public required string SerialNumber { get; set; }
+ 
+        public string SerialNumber { get; set; }
         public string? Manufacturer { get; set; }
-        public required string WipeMethodName { get; set; }
+        public string WipeMethodName { get; set; }
         public int OverwritePasses { get; set; }
-        public required string performedBy { get; set; }
+        public string performedBy { get; set; }
 
         [JsonIgnore]
         public virtual WipeJob WipeJob { get; set; }  // Navigation property

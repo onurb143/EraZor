@@ -1,5 +1,6 @@
 ﻿using EraZor.Data;
-using EraZor.Models;
+using EraZor.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ public class WipeMethodsController : ControllerBase
     }
 
     // GET: api/WipeMethods
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<WipeMethod>>> GetWipeMethods()
     {

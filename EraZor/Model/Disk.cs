@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace EraZor.Models
+namespace EraZor.Model
 {
     public class Disk
     {
@@ -18,7 +18,7 @@ namespace EraZor.Models
         public required string Path { get; set; }
 
         [MaxLength(18)]
-        public required string SerialNumber { get; set; }
+        public string SerialNumber { get; set; }
 
         [MaxLength(24)]
         public string? Manufacturer { get; set; }

@@ -46,7 +46,17 @@ namespace WebKlient.Controllers
 
                 // Generer JWT baseret på brugeren
                 var token = GenerateJwtToken(user);
-                return Ok(new { token });
+
+                // Gem JWT som cookie
+                Response.Cookies.Append("jwtToken", token, new CookieOptions
+                {
+                    HttpOnly = true, // Forhindrer adgang via JavaScript
+                    Secure = true, // Kræver HTTPS
+                    SameSite = SameSiteMode.Strict, // CSRF-beskyttelse
+                    Expires = DateTime.UtcNow.AddMinutes(60) // Udløbsperiode
+                });
+
+                return Ok(new { message = "Login successful", token });
             }
             catch (Exception ex)
             {

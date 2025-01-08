@@ -63,8 +63,18 @@ public class Program
                 ClockSkew = TimeSpan.Zero
             };
 
+            // Read JWT from cookies
             options.Events = new JwtBearerEvents
             {
+                OnMessageReceived = context =>
+                {
+                    var token = context.Request.Cookies["jwtToken"];
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        context.Token = token;
+                    }
+                    return Task.CompletedTask;
+                },
                 OnAuthenticationFailed = context =>
                 {
                     Console.WriteLine($"Authentication failed: {context.Exception.Message}");
@@ -84,7 +94,7 @@ public class Program
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins(allowedOrigins)
+                policy.WithOrigins("https://localhost:5199")
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials(); // Allow sharing cookies and authorization
