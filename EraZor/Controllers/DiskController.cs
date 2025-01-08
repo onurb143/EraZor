@@ -1,13 +1,15 @@
 ﻿using EraZor.Data;
 using EraZor.DTOs;
 using EraZor.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace EraZor.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class DisksController : ControllerBase
     {
         private readonly DataContext _context;
@@ -17,9 +19,11 @@ namespace EraZor.Controllers
             _context = context;
         }
 
-        // GET: api/Disks
+        // GET: api/v1/Disks
+        [Authorize]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DiskReadDto>>> GetDisks()
+        public async Task<ActionResult<IEnumerable<object>>> GetDisks()
         {
             var disks = await _context.Disks
                 .Select(d => new DiskReadDto
@@ -33,18 +37,31 @@ namespace EraZor.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(disks);
+            var response = disks.Select(d => new
+            {
+                data = d,
+                links = new[]
+                {
+                    new { rel = "self", href = Url.Action(nameof(GetDisk), new { id = d.DiskID }) },
+                    new { rel = "delete", href = Url.Action(nameof(DeleteDisk), new { id = d.DiskID }) },
+                    new { rel = "update", href = Url.Action(nameof(UpdateDisk), new { id = d.DiskID }) }
+                }
+            });
+
+            return Ok(response);
         }
 
-        // GET: api/Disks/5
+        // GET: api/v1/Disks/{id}
+        [Authorize]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
         [HttpGet("{id}")]
-        public async Task<ActionResult<DiskReadDto>> GetDisk(int id)
+        public async Task<ActionResult<object>> GetDisk(int id)
         {
             var disk = await _context.Disks.FindAsync(id);
 
             if (disk == null)
             {
-                return NotFound();
+                return NotFound(new { error = "Not Found", message = "The specified disk was not found." });
             }
 
             var diskDto = new DiskReadDto
@@ -57,16 +74,32 @@ namespace EraZor.Controllers
                 Manufacturer = disk.Manufacturer
             };
 
-            return Ok(diskDto);
+            var response = new
+            {
+                data = diskDto,
+                links = new[]
+                {
+                    new { rel = "self", href = Url.Action(nameof(GetDisk), new { id = diskDto.DiskID }) },
+                    new { rel = "delete", href = Url.Action(nameof(DeleteDisk), new { id = diskDto.DiskID }) },
+                    new { rel = "update", href = Url.Action(nameof(UpdateDisk), new { id = diskDto.DiskID }) }
+                }
+            };
+
+            return Ok(response);
         }
 
-        // POST: api/Disks
+        // POST: api/v1/Disks
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDisk([FromBody] DiskCreateDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                // Opret ny Disk baseret på DTO
                 var disk = new Disk
                 {
                     Type = dto.Type,
@@ -93,23 +126,32 @@ namespace EraZor.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while saving the disk.", details = ex.Message });
+                return StatusCode(500, new
+                {
+                    error = "Internal Server Error",
+                    message = "An error occurred while saving the disk.",
+                    details = ex.Message
+                });
             }
         }
 
-
-        // PUT: api/Disks/5
+        // PUT: api/v1/Disks/{id}
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDisk(int id, [FromBody] DiskCreateDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var existingDisk = await _context.Disks.FindAsync(id);
 
             if (existingDisk == null)
             {
-                return NotFound();
+                return NotFound(new { error = "Not Found", message = "The specified disk was not found." });
             }
 
-            // Opdater eksisterende disk med DTO-data
             existingDisk.Type = dto.Type;
             existingDisk.Capacity = dto.Capacity;
             existingDisk.Path = dto.Path;
@@ -126,7 +168,7 @@ namespace EraZor.Controllers
             {
                 if (!DiskExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new { error = "Not Found", message = "The specified disk was not found." });
                 }
                 else
                 {
@@ -137,14 +179,15 @@ namespace EraZor.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Disks/5
+        // DELETE: api/v1/Disks/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDisk(int id)
         {
             var disk = await _context.Disks.FindAsync(id);
             if (disk == null)
             {
-                return NotFound();
+                return NotFound(new { error = "Not Found", message = "The specified disk was not found." });
             }
 
             _context.Disks.Remove(disk);
@@ -157,5 +200,26 @@ namespace EraZor.Controllers
         {
             return _context.Disks.Any(e => e.DiskID == id);
         }
+    }
+
+    public class DiskCreateDto
+    {
+        [Required]
+        public string Type { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0.")]
+        public int Capacity { get; set; }
+
+        [Required]
+        [MaxLength(200)]
+        public string Path { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string SerialNumber { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string Manufacturer { get; set; }
     }
 }

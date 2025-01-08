@@ -21,7 +21,7 @@ COPY --from=build /publish .
 COPY https/aspnetapp.pfx /app/https/
 
 
-# Kopier projektfilerne for EF-kommandosupport
+# Kopier projektfilerne for EF-kommandosupport - kun til udvikling da det bruges til at holde databasen up-to-date , in real life vil man køre migrations igennem CI/CD pipeline
 COPY EraZor.csproj .
 
 # Installer netværksværktøjer og dotnet-ef
