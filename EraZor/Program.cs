@@ -12,15 +12,15 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure Kestrel server with HTTP and HTTPS listening
+        // Configure Kestrel server
         builder.WebHost.ConfigureKestrel(options =>
         {
-            options.ListenAnyIP(5000); // Listen on HTTP port 5000 for non-secured connections
+            options.ListenAnyIP(5000); // HTTP
             if (!builder.Environment.IsDevelopment())
             {
                 options.ListenAnyIP(5002, listenOptions =>
                 {
-                    listenOptions.UseHttps("https/aspnetapp.pfx", "Test1234!"); // HTTPS with certificate
+                    listenOptions.UseHttps("https/aspnetapp.pfx", "Test1234!"); // HTTPS
                 });
             }
         });
@@ -49,55 +49,45 @@ public class Program
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddJwtBearer(options =>
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(),
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
         {
-            options.TokenValidationParameters = new TokenValidationParameters
+            // Tjek om tokenet findes som en cookie
+            var token = context.Request.Cookies["jwtToken"];
+            if (!string.IsNullOrEmpty(token))
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(),
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ClockSkew = TimeSpan.Zero
-            };
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
 
-            // Read JWT from cookies
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    var token = context.Request.Cookies["jwtToken"];
-                    if (!string.IsNullOrEmpty(token))
-                    {
-                        context.Token = token;
-                    }
-                    return Task.CompletedTask;
-                },
-                OnAuthenticationFailed = context =>
-                {
-                    Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                    return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
-                {
-                    Console.WriteLine("Token validated successfully.");
-                    return Task.CompletedTask;
-                }
-            };
-        });
 
-        // Configure CORS (Cross-Origin Resource Sharing)
-        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? new[] { "https://localhost:5199" };
+        // Configure CORS
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins("https://localhost:5199")
+                policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>())
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .AllowCredentials(); // Allow sharing cookies and authorization
+                      .AllowCredentials();
             });
         });
 
@@ -141,7 +131,7 @@ public class Program
 
         var app = builder.Build();
 
-        // Middleware order
+        // Middleware pipeline
         app.UseHttpsRedirection();
         app.UseCors("AllowSpecificOrigins");
         app.UseAuthentication();
@@ -159,7 +149,7 @@ public class Program
 
         app.MapControllers();
 
-        // Database migrations
+        // Apply migrations
         using (var scope = app.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
