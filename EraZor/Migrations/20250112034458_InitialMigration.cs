@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace EraZor.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateSchema : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,6 +51,38 @@ namespace EraZor.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Disks",
+                columns: table => new
+                {
+                    DiskID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Capacity = table.Column<int>(type: "integer", nullable: false),
+                    Path = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
+                    SerialNumber = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: false),
+                    Manufacturer = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Disks", x => x.DiskID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WipeMethods",
+                columns: table => new
+                {
+                    WipeMethodID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    OverwritePass = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WipeMethods", x => x.WipeMethodID);
                 });
 
             migrationBuilder.CreateTable(
@@ -157,6 +191,61 @@ namespace EraZor.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WipeJobs",
+                columns: table => new
+                {
+                    WipeJobId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: true),
+                    DiskId = table.Column<int>(type: "integer", nullable: false),
+                    WipeMethodId = table.Column<int>(type: "integer", nullable: false),
+                    PerformedByUserId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WipeJobs", x => x.WipeJobId);
+                    table.ForeignKey(
+                        name: "FK_WipeJobs_AspNetUsers_PerformedByUserId",
+                        column: x => x.PerformedByUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WipeJobs_Disks_DiskId",
+                        column: x => x.DiskId,
+                        principalTable: "Disks",
+                        principalColumn: "DiskID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WipeJobs_WipeMethods_WipeMethodId",
+                        column: x => x.WipeMethodId,
+                        principalTable: "WipeMethods",
+                        principalColumn: "WipeMethodID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "WipeMethods",
+                columns: new[] { "WipeMethodID", "Description", "Name", "OverwritePass" },
+                values: new object[,]
+                {
+                    { 1, "Standard DoD-sletning med 3 gennemløb. Ikke ISO-certificeret.", "Secure Erase", 3 },
+                    { 2, "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.", "Zero Fill", 1 },
+                    { 3, "Skriver tilfældige data i ét gennemløb. Ikke ISO-certificeret.", "Random Fill", 1 },
+                    { 4, "Meget sikker metode med 35 gennemløb. Ikke ISO-certificeret.", "Gutmann Method", 35 },
+                    { 5, "Skriver tilfældige data i 3 gennemløb. Ikke ISO-certificeret.", "Random Data", 3 },
+                    { 6, "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.", "Write Zero", 1 },
+                    { 7, "Sikker metode med 7 gennemløb. Ikke ISO-certificeret.", "Schneier Method", 7 },
+                    { 8, "Sletning med 3 gennemløb efter britisk standard. Ikke ISO-certificeret.", "HMG IS5 (Enhanced)", 3 },
+                    { 9, "Ekstremt sikker metode med 35 gennemløb. Ikke ISO-certificeret.", "Peter Gutmann's Method", 35 },
+                    { 10, "Hurtig sletning med ét gennemløb af nulværdier. Ikke ISO-certificeret.", "Single Pass Zeroing", 1 },
+                    { 11, "Forbedret DoD-sletning med 4 gennemløb. Ikke ISO-certificeret.", "DoD 5220.22-M (E)", 4 },
+                    { 12, "ISO-standard med ét gennemløb af nulværdier. ISO-certificeret.", "ISO/IEC 27040", 1 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -193,6 +282,27 @@ namespace EraZor.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Disks_SerialNumber",
+                table: "Disks",
+                column: "SerialNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WipeJobs_DiskId",
+                table: "WipeJobs",
+                column: "DiskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WipeJobs_PerformedByUserId",
+                table: "WipeJobs",
+                column: "PerformedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WipeJobs_WipeMethodId",
+                table: "WipeJobs",
+                column: "WipeMethodId");
         }
 
         /// <inheritdoc />
@@ -214,10 +324,19 @@ namespace EraZor.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "WipeJobs");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Disks");
+
+            migrationBuilder.DropTable(
+                name: "WipeMethods");
         }
     }
 }

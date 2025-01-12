@@ -22,7 +22,7 @@ namespace EraZor.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("EraZor.Models.Disk", b =>
+            modelBuilder.Entity("EraZor.Model.Disk", b =>
                 {
                     b.Property<int>("DiskID")
                         .ValueGeneratedOnAdd()
@@ -34,6 +34,7 @@ namespace EraZor.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Manufacturer")
+                        .IsRequired()
                         .HasMaxLength(24)
                         .HasColumnType("character varying(24)");
 
@@ -49,8 +50,8 @@ namespace EraZor.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("character varying(5)");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("DiskID");
 
@@ -60,32 +61,7 @@ namespace EraZor.Migrations
                     b.ToTable("Disks");
                 });
 
-            modelBuilder.Entity("EraZor.Models.LogEntry", b =>
-                {
-                    b.Property<int>("LogID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogID"));
-
-                    b.Property<string>("Message")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("WipeJobId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("LogID");
-
-                    b.HasIndex("WipeJobId");
-
-                    b.ToTable("LogEntries");
-                });
-
-            modelBuilder.Entity("EraZor.Models.WipeMethod", b =>
+            modelBuilder.Entity("EraZor.Model.WipeMethod", b =>
                 {
                     b.Property<int>("WipeMethodID")
                         .ValueGeneratedOnAdd()
@@ -114,83 +90,90 @@ namespace EraZor.Migrations
                         new
                         {
                             WipeMethodID = 1,
-                            Description = "Standard DoD wiping method with 3 passes",
-                            Name = "DoD 5220.22-M",
+                            Description = "Standard DoD-sletning med 3 gennemløb. Ikke ISO-certificeret.",
+                            Name = "Secure Erase",
                             OverwritePass = 3
                         },
                         new
                         {
                             WipeMethodID = 2,
-                            Description = "NIST standard for clearing data with 1 pass",
-                            Name = "NIST 800-88 Clear",
+                            Description = "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.",
+                            Name = "Zero Fill",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 3,
-                            Description = "NIST standard for purging data with 1 pass",
-                            Name = "NIST 800-88 Purge",
+                            Description = "Skriver tilfældige data i ét gennemløb. Ikke ISO-certificeret.",
+                            Name = "Random Fill",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 4,
-                            Description = "Highly secure method with 35 overwrite passes",
-                            Name = "Gutmann",
+                            Description = "Meget sikker metode med 35 gennemløb. Ikke ISO-certificeret.",
+                            Name = "Gutmann Method",
                             OverwritePass = 35
                         },
                         new
                         {
                             WipeMethodID = 5,
-                            Description = "Single pass of random data",
+                            Description = "Skriver tilfældige data i 3 gennemløb. Ikke ISO-certificeret.",
                             Name = "Random Data",
-                            OverwritePass = 1
+                            OverwritePass = 3
                         },
                         new
                         {
                             WipeMethodID = 6,
-                            Description = "Single pass of zeroes",
+                            Description = "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.",
                             Name = "Write Zero",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 7,
-                            Description = "Single pass of ones",
-                            Name = "Write One",
-                            OverwritePass = 1
-                        },
-                        new
-                        {
-                            WipeMethodID = 8,
-                            Description = "Custom 7-pass wiping method",
-                            Name = "Schneider",
+                            Description = "Sikker metode med 7 gennemløb. Ikke ISO-certificeret.",
+                            Name = "Schneier Method",
                             OverwritePass = 7
                         },
                         new
                         {
+                            WipeMethodID = 8,
+                            Description = "Sletning med 3 gennemløb efter britisk standard. Ikke ISO-certificeret.",
+                            Name = "HMG IS5 (Enhanced)",
+                            OverwritePass = 3
+                        },
+                        new
+                        {
                             WipeMethodID = 9,
-                            Description = "Secure 10-pass overwrite method",
-                            Name = "Bruce Force",
-                            OverwritePass = 10
+                            Description = "Ekstremt sikker metode med 35 gennemløb. Ikke ISO-certificeret.",
+                            Name = "Peter Gutmann's Method",
+                            OverwritePass = 35
                         },
                         new
                         {
                             WipeMethodID = 10,
-                            Description = "Fast format with 1 pass",
-                            Name = "Quick Format",
+                            Description = "Hurtig sletning med ét gennemløb af nulværdier. Ikke ISO-certificeret.",
+                            Name = "Single Pass Zeroing",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 11,
-                            Description = "Complete format with 1 pass",
-                            Name = "Full Format",
+                            Description = "Forbedret DoD-sletning med 4 gennemløb. Ikke ISO-certificeret.",
+                            Name = "DoD 5220.22-M (E)",
+                            OverwritePass = 4
+                        },
+                        new
+                        {
+                            WipeMethodID = 12,
+                            Description = "ISO-standard med ét gennemløb af nulværdier. ISO-certificeret.",
+                            Name = "ISO/IEC 27040",
                             OverwritePass = 1
                         });
                 });
 
-            modelBuilder.Entity("EraZor.Models.WipeReport", b =>
+            modelBuilder.Entity("EraZor.Model.WipeReport", b =>
                 {
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
@@ -206,6 +189,9 @@ namespace EraZor.Migrations
 
                     b.Property<int>("OverwritePasses")
                         .HasColumnType("integer");
+
+                    b.Property<string>("PerformedBy")
+                        .HasColumnType("text");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
@@ -224,10 +210,6 @@ namespace EraZor.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("WipeMethodName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("performedBy")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -450,12 +432,14 @@ namespace EraZor.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("PerformedByUserId")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<int>("WipeMethodId")
                         .HasColumnType("integer");
@@ -464,23 +448,14 @@ namespace EraZor.Migrations
 
                     b.HasIndex("DiskId");
 
+                    b.HasIndex("PerformedByUserId");
+
                     b.HasIndex("WipeMethodId");
 
                     b.ToTable("WipeJobs");
                 });
 
-            modelBuilder.Entity("EraZor.Models.LogEntry", b =>
-                {
-                    b.HasOne("WipeJob", "WipeJob")
-                        .WithMany("LogEntries")
-                        .HasForeignKey("WipeJobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WipeJob");
-                });
-
-            modelBuilder.Entity("EraZor.Models.WipeReport", b =>
+            modelBuilder.Entity("EraZor.Model.WipeReport", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
@@ -550,13 +525,18 @@ namespace EraZor.Migrations
 
             modelBuilder.Entity("WipeJob", b =>
                 {
-                    b.HasOne("EraZor.Models.Disk", "Disk")
+                    b.HasOne("EraZor.Model.Disk", "Disk")
                         .WithMany("WipeJobs")
                         .HasForeignKey("DiskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EraZor.Models.WipeMethod", "WipeMethod")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "PerformedByUser")
+                        .WithMany()
+                        .HasForeignKey("PerformedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("EraZor.Model.WipeMethod", "WipeMethod")
                         .WithMany("WipeJobs")
                         .HasForeignKey("WipeMethodId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -564,22 +544,19 @@ namespace EraZor.Migrations
 
                     b.Navigation("Disk");
 
+                    b.Navigation("PerformedByUser");
+
                     b.Navigation("WipeMethod");
                 });
 
-            modelBuilder.Entity("EraZor.Models.Disk", b =>
+            modelBuilder.Entity("EraZor.Model.Disk", b =>
                 {
                     b.Navigation("WipeJobs");
                 });
 
-            modelBuilder.Entity("EraZor.Models.WipeMethod", b =>
+            modelBuilder.Entity("EraZor.Model.WipeMethod", b =>
                 {
                     b.Navigation("WipeJobs");
-                });
-
-            modelBuilder.Entity("WipeJob", b =>
-                {
-                    b.Navigation("LogEntries");
                 });
 #pragma warning restore 612, 618
         }

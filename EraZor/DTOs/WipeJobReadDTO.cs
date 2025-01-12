@@ -1,4 +1,4 @@
-﻿namespace EraZor.DTOs
+﻿/*namespace EraZor.DTOs
 {
     public class WipeJobReadDTO
     {
@@ -11,3 +11,4 @@
     }
 
 }
+*/

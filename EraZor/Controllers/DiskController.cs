@@ -7,10 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EraZor.Controllers
 {
+    // Defines this controller as an API controller and sets the base route for the API endpoints
     [ApiController]
     [Route("api/[controller]")]
     public class DisksController : ControllerBase
     {
+        // Dependency injection for DataContext to interact with the database
         private readonly DataContext _context;
 
         public DisksController(DataContext context)
@@ -18,11 +20,12 @@ namespace EraZor.Controllers
             _context = context;
         }
 
-        // GET: api/Disks
-        [Authorize]
+        // GET: api/Disks - Fetches all disks from the database
+        [Authorize] // Ensures only authenticated users can access this endpoint
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DiskReadDto>>> GetDisks()
         {
+            // Fetching disks and mapping to DTOs for safer and cleaner output
             var disks = await _context.Disks
                 .Select(d => new DiskReadDto
                 {
@@ -35,14 +38,16 @@ namespace EraZor.Controllers
                 })
                 .ToListAsync();
 
+            // Returns the list of disks as an HTTP 200 OK response
             return Ok(disks);
         }
 
-        // GET: api/Disks/5
+        // GET: api/Disks/5 - Fetches a specific disk by ID
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<DiskReadDto>> GetDisk(int id)
         {
+            // Find disk by ID, returns NotFound if no disk is found
             var disk = await _context.Disks.FindAsync(id);
 
             if (disk == null)
@@ -50,6 +55,7 @@ namespace EraZor.Controllers
                 return NotFound();
             }
 
+            // Mapping the found disk to DTO
             var diskDto = new DiskReadDto
             {
                 DiskID = disk.DiskID,
@@ -60,17 +66,18 @@ namespace EraZor.Controllers
                 Manufacturer = disk.Manufacturer
             };
 
+            // Returns the disk as an HTTP 200 OK response
             return Ok(diskDto);
         }
 
-        // POST: api/Disks
+        // POST: api/Disks - Creates a new disk entry
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDisk([FromBody] DiskCreateDto dto)
         {
             try
             {
-                // Opret ny Disk baseret på DTO
+                // Create new Disk object based on the incoming DTO data
                 var disk = new Disk
                 {
                     Type = dto.Type,
@@ -80,9 +87,11 @@ namespace EraZor.Controllers
                     Manufacturer = dto.Manufacturer
                 };
 
+                // Add the new disk to the database context and save changes
                 _context.Disks.Add(disk);
                 await _context.SaveChangesAsync();
 
+                // Map the newly created disk to a DTO to return to the client
                 var result = new DiskReadDto
                 {
                     DiskID = disk.DiskID,
@@ -93,72 +102,37 @@ namespace EraZor.Controllers
                     Manufacturer = disk.Manufacturer
                 };
 
+                // Returns an HTTP 201 Created status with the result and location of the new resource
                 return CreatedAtAction(nameof(GetDisk), new { id = result.DiskID }, result);
             }
             catch (Exception ex)
             {
+                // Returns an HTTP 500 error if something goes wrong
                 return StatusCode(500, new { message = "An error occurred while saving the disk.", details = ex.Message });
             }
         }
 
-
-        // PUT: api/Disks/5
-        [Authorize]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDisk(int id, [FromBody] DiskCreateDto dto)
-        {
-            var existingDisk = await _context.Disks.FindAsync(id);
-
-            if (existingDisk == null)
-            {
-                return NotFound();
-            }
-
-            // Opdater eksisterende disk med DTO-data
-            existingDisk.Type = dto.Type;
-            existingDisk.Capacity = dto.Capacity;
-            existingDisk.Path = dto.Path;
-            existingDisk.SerialNumber = dto.SerialNumber;
-            existingDisk.Manufacturer = dto.Manufacturer;
-
-            _context.Entry(existingDisk).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DiskExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/Disks/5
+        // DELETE: api/Disks/5 - Deletes a specific disk by ID
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDisk(int id)
         {
+            // Find disk by ID to delete, returns NotFound if no disk is found
             var disk = await _context.Disks.FindAsync(id);
             if (disk == null)
             {
                 return NotFound();
             }
 
+            // Remove the found disk and save changes to the database
             _context.Disks.Remove(disk);
             await _context.SaveChangesAsync();
 
+            // Returns HTTP 204 No Content status indicating successful deletion
             return NoContent();
         }
 
+        // Helper method to check if a disk exists in the database
         private bool DiskExists(int id)
         {
             return _context.Disks.Any(e => e.DiskID == id);

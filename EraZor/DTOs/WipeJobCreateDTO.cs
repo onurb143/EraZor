@@ -1,4 +1,4 @@
-﻿namespace EraZor.DTOs
+﻿/*namespace EraZor.DTOs
 {
     public class WipeJobCreateDto
     {
@@ -9,3 +9,4 @@
         public int WipeMethodId { get; set; }
     }
 }
+*/

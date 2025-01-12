@@ -7,27 +7,26 @@ namespace EraZor.Model
     public class WipeReport
     {
         [ForeignKey("WipeJobId")]
-        public int WipeJobId { get; set; } 
+        public int WipeJobId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string? Status { get; set; }
-        public string? DiskType { get; set; }
+        public string Status { get; set; }
+        public string DiskType { get; set; }
         public int Capacity { get; set; }
- 
         public string SerialNumber { get; set; }
-        public string? Manufacturer { get; set; }
+        public string Manufacturer { get; set; }
         public string WipeMethodName { get; set; }
         public int OverwritePasses { get; set; }
-        public string performedBy { get; set; }
+        public string PerformedBy { get; set; }  // PerformedBy refers to IdentityUser username
 
         [JsonIgnore]
-        public virtual WipeJob WipeJob { get; set; }  // Navigation property
+        public virtual WipeJob WipeJob { get; set; }
 
-        // Fremmed nøgle til IdentityUser
+        // ForeignKey to IdentityUser (PerformedBy)
         [ForeignKey("UserId")]
-        public string? UserId { get; set; }
+        public string UserId { get; set; }  // PerformedBy user ID
 
-        // Navigation property til IdentityUser
-        public virtual IdentityUser? User { get; set; }
+        public virtual IdentityUser User { get; set; }
     }
+
 }

@@ -1,4 +1,4 @@
-﻿namespace WebKlient.DTO_s
+﻿namespace EraZor.DTO
 {
     public class WipeReportReadDto
     {
@@ -12,5 +12,7 @@
         public string Manufacturer { get; set; }
         public string WipeMethodName { get; set; }
         public int OverwritePasses { get; set; }
+        public string PerformedBy { get; set; } // This will refer to the IdentityUser
     }
+
 }
