@@ -7,12 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EraZor.Controllers
 {
-    // Defines this controller as an API controller and sets the base route for the API endpoints
+    // Definerer denne controller som en API-controller og sætter base-ruten for API-endepunkterne
     [ApiController]
     [Route("api/[controller]")]
     public class DisksController : ControllerBase
     {
-        // Dependency injection for DataContext to interact with the database
+        // Dependency Injection af DataContext for at interagere med databasen
         private readonly DataContext _context;
 
         public DisksController(DataContext context)
@@ -20,12 +20,12 @@ namespace EraZor.Controllers
             _context = context;
         }
 
-        // GET: api/Disks - Fetches all disks from the database
-        [Authorize] // Ensures only authenticated users can access this endpoint
+        // GET: api/Disks - Henter alle diske fra databasen
+        [Authorize] // Sikrer at kun autentificerede brugere kan tilgå denne endpoint
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DiskReadDto>>> GetDisks()
         {
-            // Fetching disks and mapping to DTOs for safer and cleaner output
+            // Henter alle diske og mapper dem til DTO'er for at sikre renere og sikrere output
             var disks = await _context.Disks
                 .Select(d => new DiskReadDto
                 {
@@ -38,16 +38,16 @@ namespace EraZor.Controllers
                 })
                 .ToListAsync();
 
-            // Returns the list of disks as an HTTP 200 OK response
+            // Returnerer listen af diske som en HTTP 200 OK respons
             return Ok(disks);
         }
 
-        // GET: api/Disks/5 - Fetches a specific disk by ID
+        // GET: api/Disks/5 - Henter en specifik disk baseret på ID
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<DiskReadDto>> GetDisk(int id)
         {
-            // Find disk by ID, returns NotFound if no disk is found
+            // Finder disk baseret på ID, returnerer NotFound hvis ingen disk findes
             var disk = await _context.Disks.FindAsync(id);
 
             if (disk == null)
@@ -55,7 +55,7 @@ namespace EraZor.Controllers
                 return NotFound();
             }
 
-            // Mapping the found disk to DTO
+            // Mapper den fundne disk til en DTO
             var diskDto = new DiskReadDto
             {
                 DiskID = disk.DiskID,
@@ -66,18 +66,18 @@ namespace EraZor.Controllers
                 Manufacturer = disk.Manufacturer
             };
 
-            // Returns the disk as an HTTP 200 OK response
+            // Returnerer den fundne disk som en HTTP 200 OK respons
             return Ok(diskDto);
         }
 
-        // POST: api/Disks - Creates a new disk entry
+        // POST: api/Disks - Opretter en ny disk
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDisk([FromBody] DiskCreateDto dto)
         {
             try
             {
-                // Create new Disk object based on the incoming DTO data
+                // Opretter en ny Disk baseret på de indkommende DTO-data
                 var disk = new Disk
                 {
                     Type = dto.Type,
@@ -87,11 +87,11 @@ namespace EraZor.Controllers
                     Manufacturer = dto.Manufacturer
                 };
 
-                // Add the new disk to the database context and save changes
+                // Tilføjer den nye disk til databasen og gemmer ændringerne
                 _context.Disks.Add(disk);
                 await _context.SaveChangesAsync();
 
-                // Map the newly created disk to a DTO to return to the client
+                // Mapper den nye oprettede disk til en DTO for at returnere til klienten
                 var result = new DiskReadDto
                 {
                     DiskID = disk.DiskID,
@@ -102,37 +102,37 @@ namespace EraZor.Controllers
                     Manufacturer = disk.Manufacturer
                 };
 
-                // Returns an HTTP 201 Created status with the result and location of the new resource
+                // Returnerer en HTTP 201 Created status med den oprettede disk og dens placering
                 return CreatedAtAction(nameof(GetDisk), new { id = result.DiskID }, result);
             }
             catch (Exception ex)
             {
-                // Returns an HTTP 500 error if something goes wrong
+                // Returnerer en HTTP 500 fejl, hvis der opstår en fejl under oprettelsen
                 return StatusCode(500, new { message = "An error occurred while saving the disk.", details = ex.Message });
             }
         }
 
-        // DELETE: api/Disks/5 - Deletes a specific disk by ID
+        // DELETE: api/Disks/5 - Sletter en specifik disk baseret på ID
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDisk(int id)
         {
-            // Find disk by ID to delete, returns NotFound if no disk is found
+            // Finder disk baseret på ID, returnerer NotFound hvis ingen disk findes
             var disk = await _context.Disks.FindAsync(id);
             if (disk == null)
             {
                 return NotFound();
             }
 
-            // Remove the found disk and save changes to the database
+            // Fjerner den fundne disk og gemmer ændringerne i databasen
             _context.Disks.Remove(disk);
             await _context.SaveChangesAsync();
 
-            // Returns HTTP 204 No Content status indicating successful deletion
+            // Returnerer HTTP 204 No Content status for at indikere en succesfuld sletning
             return NoContent();
         }
 
-        // Helper method to check if a disk exists in the database
+        // Hjælpermetode for at tjekke om en disk eksisterer i databasen
         private bool DiskExists(int id)
         {
             return _context.Disks.Any(e => e.DiskID == id);

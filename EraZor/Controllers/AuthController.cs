@@ -1,5 +1,4 @@
-﻿// Importerer nødvendige namespaces for at arbejde med MVC, JWT, og Identity
-using Microsoft.AspNetCore.Mvc;  // Bruges til at oprette controller-klasser og actions i ASP.NET Core MVC
+﻿using Microsoft.AspNetCore.Mvc;  // Bruges til at oprette controller-klasser og actions i ASP.NET Core MVC
 using Microsoft.IdentityModel.Tokens;  // Bruges til at arbejde med JWT (JSON Web Token) og signering af tokens
 using System.IdentityModel.Tokens.Jwt;  // Bruges til at oprette, validere og analysere JWT-tokens
 using System.Security.Claims;  // Bruges til at oprette og arbejde med "claims" i JWT-tokens
@@ -127,10 +126,10 @@ namespace WebKlient.Controllers
     {
         // Brugerens email (required i stedet for nullable)
         [Required(ErrorMessage = "Email is required.")]
-        public required string Email { get; set; }
+        public string Email { get; set; }
 
         // Brugerens password (required i stedet for nullable)
         [Required(ErrorMessage = "Password is required.")]
-        public required string Password { get; set; }
+        public string Password { get; set; }
     }
 }

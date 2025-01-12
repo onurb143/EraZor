@@ -6,19 +6,19 @@
         /// Unik identifikator for disken.
         public int DiskID { get; set; }
 
-        /// Diskens type (f.eks. SSD, HDD).
-        public string Type { get; set; } = string.Empty;
+        /// Diskens type (f.eks. SSD, HDD). 
+        public required string Type { get; set; }
 
-        /// Diskens kapacitet i GB.
+        /// Diskens kapacitet i GB. Skal være et positivt tal.
         public int Capacity { get; set; }
 
         /// Diskens filsti.
-        public string Path { get; set; } = string.Empty;
+        public required string Path { get; set; }
 
-        /// Diskens serienummer.
-        public string SerialNumber { get; set; } = string.Empty;
+        /// Diskens serienummer
+        public required string SerialNumber { get; set; }
 
-        /// Diskens producent (f.eks. Samsung, Seagate).
-        public string Manufacturer { get; set; } = string.Empty;
+        /// Diskens producent (f.eks. Samsung, Seagate). 
+        public required string Manufacturer { get; set; }
     }
 }

@@ -4,69 +4,43 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[ApiController]
-[Route("api/[controller]")]
+[ApiController] // Gør denne klasse til en API controller
+[Route("api/[controller]")] // Sætter ruten til at være baseret på controllerens navn, f.eks. api/WipeMethods
 public class WipeMethodsController : ControllerBase
 {
     private readonly DataContext _context;
 
+    // Konstruktor til controlleren, som modtager DataContext for databaseinteraktion
     public WipeMethodsController(DataContext context)
     {
         _context = context;
     }
 
-    // GET: api/WipeMethods
-    [Authorize]
-    [HttpGet]
+    // GET: api/WipeMethods - Henter alle slette metoder
+    [Authorize] // Beskytter ruten ved kun at tillade autoriserede brugere at få adgang
+    [HttpGet] // HTTP GET metode
     public async Task<ActionResult<IEnumerable<WipeMethod>>> GetWipeMethods()
     {
+        // Henter alle slette metoder fra databasen og returnerer dem som en liste
         return await _context.WipeMethods.ToListAsync();
     }
 
-  /*  // GET: api/WipeMethods/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<WipeMethod>> GetWipeMethod(int id)
-    {
-        var wipeMethod = await _context.WipeMethods.FindAsync(id);
-
-        if (wipeMethod == null)
-        {
-            return NotFound();
-        }
-
-        return wipeMethod;
-    }*/
-
-   /*/ POST: api/WipeMethods
-    [HttpPost]
-    public async Task<ActionResult<WipeMethod>> PostWipeMethod(WipeMethod wipeMethod)
-    {
-        _context.WipeMethods.Add(wipeMethod);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetWipeMethod), new { id = wipeMethod.WipeMethodID }, wipeMethod);
-    }*/
-
-    // DELETE: api/WipeMethods/5
-    [Authorize]
-    [HttpDelete("{id}")]
+    // DELETE: api/WipeMethods/5 - Sletter en slette metode baseret på ID
+    [Authorize] // Beskytter sletningen ved kun at tillade autoriserede brugere at slette
+    [HttpDelete("{id}")] // HTTP DELETE metode
     public async Task<IActionResult> DeleteWipeMethod(int id)
     {
+        // Finder den slette metode med det angivne ID
         var wipeMethod = await _context.WipeMethods.FindAsync(id);
         if (wipeMethod == null)
         {
-            return NotFound();
+            return NotFound(); // Returnerer 404 Not Found hvis slette metoden ikke findes
         }
 
+        // Fjerner slette metoden fra databasen
         _context.WipeMethods.Remove(wipeMethod);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); // Gemmer ændringerne i databasen
 
-        return NoContent();  // Returnerer en tom svarkode, som indikerer, at sletningen lykkedes
-    }
-
-    // Helper-metode for at tjekke om wipeMethod eksisterer
-    private bool WipeMethodExists(int id)
-    {
-        return _context.WipeMethods.Any(e => e.WipeMethodID == id);
+        return NoContent();  // Returnerer en tom svarkode (204 No Content) for at indikere succesfuld sletning
     }
 }

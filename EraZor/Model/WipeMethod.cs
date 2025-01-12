@@ -10,13 +10,14 @@ namespace EraZor.Model
         public int WipeMethodID { get; set; }
 
         [Required] // Feltet er påkrævet
-        [MaxLength(30)] // Sætter en maksimal længde for navn
+        [StringLength(30, ErrorMessage = "Name cannot exceed 30 characters.")] // Sætter en maksimal længde for navn
         public string Name { get; set; } = string.Empty;
 
-        [MaxLength(500)] // Beskrivelse kan være længere, men vi sætter en grænse
+        [Required]
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")] // Maksimal længde for beskrivelse
         public string Description { get; set; } = string.Empty;
 
-        [Range(1, int.MaxValue, ErrorMessage = "OverwritePass skal være større end 0.")] // Validering for positive værdier
+        [Range(1, int.MaxValue, ErrorMessage = "OverwritePass must be greater than 0.")] // Validering for positive værdier
         public int OverwritePass { get; set; }
 
         // Navigation property til relationen med WipeJobs

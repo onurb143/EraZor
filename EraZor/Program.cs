@@ -12,86 +12,86 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure Kestrel server
+        // Konfigurer Kestrel-serveren til at lytte på både HTTP og HTTPS
         builder.WebHost.ConfigureKestrel(options =>
         {
-            options.ListenAnyIP(5000); // HTTP
+            options.ListenAnyIP(5000); // Lyt efter HTTP-anmodninger på port 5000
             if (!builder.Environment.IsDevelopment())
             {
                 options.ListenAnyIP(5002, listenOptions =>
                 {
-                    listenOptions.UseHttps("https/aspnetapp.pfx", "Test1234!"); // HTTPS
+                    // Lyt efter HTTPS-anmodninger på port 5002 selvsigneret certifikat til udvikling
+                    listenOptions.UseHttps("https/aspnetapp.pfx", "Test1234!");
                 });
             }
         });
 
-        // Configure PostgreSQL database connection
+        // Konfigurer PostgreSQL databaseforbindelsen ved hjælp af connection string
         builder.Services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        // Configure Identity for users and roles
+        // Konfigurer Identity for brugere og roller
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
-            options.Password.RequireDigit = true;
-            options.Password.RequiredLength = 8;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = true;
+            options.Password.RequireDigit = true; // Kræver mindst ét tal i password
+            options.Password.RequiredLength = 8;  // Minimumslængde for password er 8 tegn
+            options.Password.RequireNonAlphanumeric = false; // Tillader ikke nødvendigvis specialtegn
+            options.Password.RequireUppercase = true; // Kræver mindst ét stort bogstav
         })
-        .AddEntityFrameworkStores<DataContext>()
-        .AddDefaultTokenProviders();
+        .AddEntityFrameworkStores<DataContext>() // Brug Entity Framework til at gemme brugere
+        .AddDefaultTokenProviders(); // Tilføjer standard token provider for f.eks. password reset
 
-        // Configure JWT Authentication
+        // Konfigurer JWT Authentication
         var jwtSettings = builder.Configuration.GetSection("JwtSettings");
         var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]);
 
         builder.Services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default autentificering bruger JWT
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Default challenge sker også via JWT
         })
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(),
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ClockSkew = TimeSpan.Zero
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
+        .AddJwtBearer(options =>
         {
-            // Tjek om tokenet findes som en cookie
-            var token = context.Request.Cookies["jwtToken"];
-            if (!string.IsNullOrEmpty(token))
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                context.Token = token;
-            }
-            return Task.CompletedTask;
-        }
-    };
-});
+                ValidateIssuer = true, // Valider om issuer matcher
+                ValidateAudience = true, // Valider om audience matcher
+                ValidateLifetime = true, // Valider om token er udløbet
+                ValidateIssuerSigningKey = true, // Valider signatur af token
+                ValidIssuer = jwtSettings["Issuer"], // Giv gyldigt issuer
+                ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(), // Gyldige audiences
+                IssuerSigningKey = new SymmetricSecurityKey(key), // Signeringsnøgle
+                ClockSkew = TimeSpan.Zero // Ingen tidsforskel tilladt ved token validering
+            };
 
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    // Tjek om token findes som en cookie og sætte det i requesten
+                    var token = context.Request.Cookies["jwtToken"];
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        context.Token = token;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
 
-        // Configure CORS
+        // Konfigurer CORS (Cross-Origin Resource Sharing)
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>())
-                      .AllowAnyMethod()
-                      .AllowAnyHeader()
-                      .AllowCredentials();
+                policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()) // Tillad oprindelser fra config
+                      .AllowAnyMethod() // Tillad alle HTTP-metoder
+                      .AllowAnyHeader() // Tillad alle headers
+                      .AllowCredentials(); // Tillad cookies og credentials i anmodninger
             });
         });
 
-        // Configure Swagger
+        // Konfigurer Swagger til API-dokumentation
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
@@ -103,6 +103,7 @@ public class Program
                 Description = "JWT Authentication enabled API"
             });
 
+            // Tilføj sikkerhedsdefinition for Bearer token i Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -132,39 +133,39 @@ public class Program
         var app = builder.Build();
 
         // Middleware pipeline
-        app.UseHttpsRedirection();
-        app.UseCors("AllowSpecificOrigins");
-        app.UseAuthentication();
-        app.UseAuthorization();
+        app.UseHttpsRedirection(); // Tving HTTP-anmodninger til HTTPS
+        app.UseCors("AllowSpecificOrigins"); // Aktivér CORS med specifikke oprindelser
+        app.UseAuthentication(); // Aktivér JWT-autentifikation
+        app.UseAuthorization(); // Aktivér autorisation
 
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger();
+            app.UseSwagger(); // Aktivér Swagger i udviklingsmiljø
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation");
-                c.RoutePrefix = string.Empty;
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation"); // Swagger UI endpoint
+                c.RoutePrefix = string.Empty; // Root path for Swagger UI
             });
         }
 
-        app.MapControllers();
+        app.MapControllers(); // Kortlæg controllers til API-ruter
 
-        // Apply migrations
+        // Anvend migrationer til databasen
         using (var scope = app.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
             try
             {
-                dbContext.Database.Migrate();
+                dbContext.Database.Migrate(); // Anvend eventuelle database-migrationer
                 Console.WriteLine("Database connected and migrations applied successfully!");
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Database connection or migration failed: {ex}");
-                Environment.Exit(1);
+                Environment.Exit(1); // Stop applikationen, hvis migrationen mislykkedes
             }
         }
 
-        app.Run();
+        app.Run(); // Kør applikationen
     }
 }
