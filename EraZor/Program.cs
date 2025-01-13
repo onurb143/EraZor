@@ -1,4 +1,6 @@
 using EraZor.Data;
+using EraZor.Interfaces;
+using EraZor.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +12,12 @@ public class Program
 {
     public static void Main(string[] args)
     {
+
+
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddScoped<IDiskService, DiskService>();
+
 
         // Konfigurer Kestrel-serveren til at lytte på både HTTP og HTTPS
         builder.WebHost.ConfigureKestrel(options =>
@@ -25,6 +32,8 @@ public class Program
                 });
             }
         });
+
+
 
         // Konfigurer PostgreSQL databaseforbindelsen ved hjælp af connection string
         builder.Services.AddDbContext<DataContext>(options =>

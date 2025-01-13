@@ -44,3 +44,8 @@ public class WipeMethodsController : ControllerBase
         return NoContent();  // Returnerer en tom svarkode (204 No Content) for at indikere succesfuld sletning
     }
 }
+
+
+
+
+

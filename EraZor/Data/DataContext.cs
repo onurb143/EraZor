@@ -50,18 +50,19 @@ public class DataContext : IdentityDbContext<IdentityUser>
 
         // Seed data for WipeMethod
         modelBuilder.Entity<WipeMethod>().HasData(
-            new WipeMethod { WipeMethodID = 1, Name = "Secure Erase", OverwritePass = 3, Description = "Standard DoD-sletning med 3 gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 2, Name = "Zero Fill", OverwritePass = 1, Description = "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 3, Name = "Random Fill", OverwritePass = 1, Description = "Skriver tilfældige data i ét gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 4, Name = "Gutmann Method", OverwritePass = 35, Description = "Meget sikker metode med 35 gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 5, Name = "Random Data", OverwritePass = 3, Description = "Skriver tilfældige data i 3 gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 6, Name = "Write Zero", OverwritePass = 1, Description = "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 7, Name = "Schneier Method", OverwritePass = 7, Description = "Sikker metode med 7 gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 8, Name = "HMG IS5 (Enhanced)", OverwritePass = 3, Description = "Sletning med 3 gennemløb efter britisk standard. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 9, Name = "Peter Gutmann's Method", OverwritePass = 35, Description = "Ekstremt sikker metode med 35 gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 10, Name = "Single Pass Zeroing", OverwritePass = 1, Description = "Hurtig sletning med ét gennemløb af nulværdier. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 11, Name = "DoD 5220.22-M (E)", OverwritePass = 4, Description = "Forbedret DoD-sletning med 4 gennemløb. Ikke ISO-certificeret." },
-            new WipeMethod { WipeMethodID = 12, Name = "ISO/IEC 27040", OverwritePass = 1, Description = "ISO-standard med ét gennemløb af nulværdier. ISO-certificeret." }
+            new WipeMethod { WipeMethodID = 1, Name = "Secure Erase", OverwritePass = 1, Description = "Sikker metode, der udføres på hardware-niveau via SSD-controlleren. Ideel til SSD'er og NVMe. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 2, Name = "Zero Fill", OverwritePass = 1, Description = "Overskriver med nulværdier i ét gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er pga. wear leveling. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 3, Name = "Random Fill", OverwritePass = 1, Description = "Overskriver med tilfældige data i ét gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 4, Name = "Gutmann Method", OverwritePass = 35, Description = "Avanceret metode med 35 gennemløb designet til ældre HDD'er. Ikke egnet til moderne HDD'er, SSD'er eller NVMe. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 5, Name = "Random Data", OverwritePass = 3, Description = "Overskriver med tilfældige data i 3 gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 6, Name = "Write Zero", OverwritePass = 1, Description = "Skriver nulværdier i ét gennemløb. God til HDD'er, mindre effektiv på SSD'er. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 7, Name = "Schneier Method", OverwritePass = 7, Description = "Metode med 7 gennemløb, som er sikker og velegnet til HDD'er. Overkill for SSD'er og NVMe. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 8, Name = "HMG IS5 (Enhanced)", OverwritePass = 3, Description = "Standardiseret metode med 3 gennemløb. Velegnet til HDD'er. Ikke egnet til SSD'er eller NVMe. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 9, Name = "Peter Gutmann's Method", OverwritePass = 35, Description = "Ekstremt sikker metode med 35 gennemløb, designet til ældre HDD'er. Ikke egnet til SSD'er eller NVMe. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 10, Name = "Single Pass Zeroing", OverwritePass = 1, Description = "Hurtig metode med ét gennemløb af nulværdier. Velegnet til HDD'er, men mindre effektiv for SSD'er pga. wear leveling. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 11, Name = "DoD 5220.22-M (E)", OverwritePass = 4, Description = "DoD-standard med 4 gennemløb. Velegnet til HDD'er, mindre relevant for SSD'er. Ikke ISO-certificeret." },
+            new WipeMethod { WipeMethodID = 12, Name = "ISO/IEC 27040", OverwritePass = 1, Description = "ISO-standardiseret metode med ét gennemløb af nulværdier. Ideel til SSD'er, NVMe og HDD'er. ISO-certificeret." }
         );
+
     }
 }
