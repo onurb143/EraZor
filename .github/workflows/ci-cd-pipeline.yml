@@ -23,9 +23,7 @@ jobs:
       with:
         dotnet-version: 9.0
 
-    # 4. Restore afhængigheder
-    - name: Restore dependencies
-      run: dotnet restore WebKlient/WebKlient.csproj
+
 
     # 5. Byg projektet
     - name: Build project
