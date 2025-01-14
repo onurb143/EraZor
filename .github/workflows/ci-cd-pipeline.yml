@@ -23,15 +23,19 @@ jobs:
       with:
         dotnet-version: 9.0
 
-    # 3. Restore afhængigheder
-    - name: Restore dependencies
-      run: dotnet restore
+    # 3. Opdater submoduler (hvis nødvendigt)
+    - name: Update submodules
+      run: git submodule update --init --recursive
 
-    # 4. Byg projektet
+    # 4. Restore afhængigheder
+    - name: Restore dependencies
+      run: dotnet restore ./repos/WebKlient/WebKlient.csproj
+
+    # 5. Byg projektet
     - name: Build project
       run: dotnet build --no-restore --configuration Release
 
-    # 5. Kør Unit Tests
+    # 6. Kør Unit Tests
     - name: Run Unit Tests
       run: dotnet test --no-build --filter Category=Unit --configuration Release
 
@@ -65,8 +69,7 @@ jobs:
 
     # 2. Kør Newman Tests
     - name: Run E2E Tests
-      run: newman run ./Erazor.postman_collection.json
-        -e ./Erazor.postman_environment.json
+      run: newman run ./Erazor.postman_collection.json -e ./Erazor.postman_environment.json
 
   deploy:
     runs-on: ubuntu-latest
