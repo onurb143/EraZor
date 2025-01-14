@@ -37,7 +37,7 @@ jobs:
           cd EraZor
           dotnet build EraZor.sln --no-restore --configuration Release
           cd ../WebKlient
-          dotnet build WebKlient/WebKlient.csproj --no-restore --configuration Release
+          dotnet build WebKlient.csproj --no-restore --configuration Release
 
       # 5. Kør Unit Tests
       - name: Run Unit Tests
