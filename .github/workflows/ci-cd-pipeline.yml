@@ -25,7 +25,7 @@ jobs:
 
     # 4. Restore afhængigheder
     - name: Restore dependencies
-      run: dotnet restore ./repos/WebKlient/WebKlient.csproj
+      run: dotnet restore WebKlient/WebKlient.csproj
 
     # 5. Byg projektet
     - name: Build project
