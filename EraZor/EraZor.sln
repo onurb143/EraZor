@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		..\.github\workflows\ci-cd-pipeline.yml = ..\.github\workflows\ci-cd-pipeline.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EraZor.Tests", "..\EraZor.Tests\EraZor.Tests.csproj", "{5825B0CF-2FB9-4669-A361-396D99B5F304}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{4082217E-16ED-4D4D-810C-DBDF74E0021A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4082217E-16ED-4D4D-810C-DBDF74E0021A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4082217E-16ED-4D4D-810C-DBDF74E0021A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5825B0CF-2FB9-4669-A361-396D99B5F304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5825B0CF-2FB9-4669-A361-396D99B5F304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5825B0CF-2FB9-4669-A361-396D99B5F304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5825B0CF-2FB9-4669-A361-396D99B5F304}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

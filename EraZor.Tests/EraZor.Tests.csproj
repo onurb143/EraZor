@@ -29,7 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\EraZor\EraZor\EraZor.csproj" />
+    <ProjectReference Include="..\EraZor\EraZor\EraZor.csproj" />
+    <ProjectReference Include="..\EraZor\EraZor\EraZor.csproj" />
+    <ProjectReference Include="..\EraZor\EraZor\EraZor.csproj" />
+	  
   </ItemGroup>
 
 </Project>
