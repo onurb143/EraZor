@@ -17,7 +17,6 @@ namespace EraZor.Model
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")] // Maksimal længde for beskrivelse
         public string Description { get; set; } = string.Empty;
 
-        [Range(1, int.MaxValue, ErrorMessage = "OverwritePass must be greater than 0.")] // Validering for positive værdier
         public int OverwritePass { get; set; }
 
         // Navigation property til relationen med WipeJobs

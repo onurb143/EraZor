@@ -12,12 +12,13 @@ public class Program
 {
     public static void Main(string[] args)
     {
-
-
         var builder = WebApplication.CreateBuilder(args);
 
+        // Tilføj services til DI containeren før Build
         builder.Services.AddScoped<IDiskService, DiskService>();
-
+        builder.Services.AddScoped<IWipeMethodService, WipeMethodService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IWipeReportService, WipeReportService>();
 
         // Konfigurer Kestrel-serveren til at lytte på både HTTP og HTTPS
         builder.WebHost.ConfigureKestrel(options =>
@@ -33,8 +34,6 @@ public class Program
             }
         });
 
-
-
         // Konfigurer PostgreSQL databaseforbindelsen ved hjælp af connection string
         builder.Services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -42,13 +41,13 @@ public class Program
         // Konfigurer Identity for brugere og roller
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
-            options.Password.RequireDigit = true; // Kræver mindst ét tal i password
-            options.Password.RequiredLength = 8;  // Minimumslængde for password er 8 tegn
-            options.Password.RequireNonAlphanumeric = false; // Tillader ikke nødvendigvis specialtegn
-            options.Password.RequireUppercase = true; // Kræver mindst ét stort bogstav
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = true;
         })
-        .AddEntityFrameworkStores<DataContext>() // Brug Entity Framework til at gemme brugere
-        .AddDefaultTokenProviders(); // Tilføjer standard token provider for f.eks. password reset
+        .AddEntityFrameworkStores<DataContext>()
+        .AddDefaultTokenProviders();
 
         // Konfigurer JWT Authentication
         var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -56,28 +55,28 @@ public class Program
 
         builder.Services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default autentificering bruger JWT
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Default challenge sker også via JWT
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
+
         .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true, // Valider om issuer matcher
-                ValidateAudience = true, // Valider om audience matcher
-                ValidateLifetime = true, // Valider om token er udløbet
-                ValidateIssuerSigningKey = true, // Valider signatur af token
-                ValidIssuer = jwtSettings["Issuer"], // Giv gyldigt issuer
-                ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(), // Gyldige audiences
-                IssuerSigningKey = new SymmetricSecurityKey(key), // Signeringsnøgle
-                ClockSkew = TimeSpan.Zero // Ingen tidsforskel tilladt ved token validering
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(),
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ClockSkew = TimeSpan.Zero
             };
 
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {
-                    // Tjek om token findes som en cookie og sætte det i requesten
                     var token = context.Request.Cookies["jwtToken"];
                     if (!string.IsNullOrEmpty(token))
                     {
@@ -88,15 +87,15 @@ public class Program
             };
         });
 
-        // Konfigurer CORS (Cross-Origin Resource Sharing)
+        // Konfigurer CORS
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()) // Tillad oprindelser fra config
-                      .AllowAnyMethod() // Tillad alle HTTP-metoder
-                      .AllowAnyHeader() // Tillad alle headers
-                      .AllowCredentials(); // Tillad cookies og credentials i anmodninger
+                policy.WithOrigins("https://localhost:5002", "https://localhost:5199")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials();
             });
         });
 
@@ -112,7 +111,6 @@ public class Program
                 Description = "JWT Authentication enabled API"
             });
 
-            // Tilføj sikkerhedsdefinition for Bearer token i Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -142,39 +140,38 @@ public class Program
         var app = builder.Build();
 
         // Middleware pipeline
-        app.UseHttpsRedirection(); // Tving HTTP-anmodninger til HTTPS
-        app.UseCors("AllowSpecificOrigins"); // Aktivér CORS med specifikke oprindelser
-        app.UseAuthentication(); // Aktivér JWT-autentifikation
-        app.UseAuthorization(); // Aktivér autorisation
+        app.UseHttpsRedirection();
+        app.UseCors("AllowSpecificOrigins");
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger(); // Aktivér Swagger i udviklingsmiljø
+            app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation"); // Swagger UI endpoint
-                c.RoutePrefix = string.Empty; // Root path for Swagger UI
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation");
+                c.RoutePrefix = string.Empty;
             });
         }
 
-        app.MapControllers(); // Kortlæg controllers til API-ruter
+        app.MapControllers();
 
-        // Anvend migrationer til databasen
         using (var scope = app.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
             try
             {
-                dbContext.Database.Migrate(); // Anvend eventuelle database-migrationer
+                dbContext.Database.Migrate();
                 Console.WriteLine("Database connected and migrations applied successfully!");
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Database connection or migration failed: {ex}");
-                Environment.Exit(1); // Stop applikationen, hvis migrationen mislykkedes
+                Environment.Exit(1);
             }
         }
 
-        app.Run(); // Kør applikationen
+        app.Run();
     }
 }

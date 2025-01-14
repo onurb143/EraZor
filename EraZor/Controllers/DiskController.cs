@@ -3,9 +3,6 @@ using EraZor.Interfaces;
 using EraZor.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EraZor.Controllers
 {
@@ -13,19 +10,22 @@ namespace EraZor.Controllers
     [Route("api/[controller]")]
     public class DisksController : ControllerBase
     {
-        private readonly IDiskService _diskRepository;
+        private readonly IDiskService _diskService;
 
-        public DisksController(IDiskService diskRepository)
+        public DisksController(IDiskService diskService)
         {
-            _diskRepository = diskRepository;
+            _diskService = diskService;
         }
 
+        // GET: api/Disks
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DiskReadDto>>> GetDisks()
         {
-            var disks = await _diskRepository.GetDisksAsync();
-            var diskDtos = disks.Select(d => new DiskReadDto
+            var disks = await _diskService.GetDisksAsync();
+
+            // Map Disk til DiskReadDto (manuelt her for eksempel)
+            var result = disks.Select(d => new DiskReadDto
             {
                 DiskID = d.DiskID,
                 Type = d.Type,
@@ -33,19 +33,22 @@ namespace EraZor.Controllers
                 Path = d.Path,
                 SerialNumber = d.SerialNumber,
                 Manufacturer = d.Manufacturer
-            });
+            }).ToList();
 
-            return Ok(diskDtos);
+            return Ok(result);
         }
 
+
+        // GET: api/Disks/{id}
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<DiskReadDto>> GetDisk(int id)
         {
-            var disk = await _diskRepository.GetDiskByIdAsync(id);
+            var disk = await _diskService.GetDiskByIdAsync(id);
+
             if (disk == null)
             {
-                return NotFound();
+                return NotFound($"Disk med ID {id} blev ikke fundet.");
             }
 
             var diskDto = new DiskReadDto
@@ -61,10 +64,16 @@ namespace EraZor.Controllers
             return Ok(diskDto);
         }
 
+        // POST: api/Disks
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDisk([FromBody] DiskCreateDto dto)
         {
+            if (dto == null || string.IsNullOrEmpty(dto.Type))
+            {
+                return BadRequest("Disk type er påkrævet.");
+            }
+
             var disk = new Disk
             {
                 Type = dto.Type,
@@ -74,7 +83,7 @@ namespace EraZor.Controllers
                 Manufacturer = dto.Manufacturer
             };
 
-            await _diskRepository.AddDiskAsync(disk);
+            await _diskService.AddDiskAsync(disk);
 
             var result = new DiskReadDto
             {
@@ -89,17 +98,18 @@ namespace EraZor.Controllers
             return CreatedAtAction(nameof(GetDisk), new { id = result.DiskID }, result);
         }
 
+        // DELETE: api/Disks/{id}
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDisk(int id)
         {
-            var exists = _diskRepository.DiskExists(id);
+            var exists = await _diskService.DiskExistsAsync(id);
             if (!exists)
             {
-                return NotFound();
+                return NotFound($"Disk med ID {id} kunne ikke findes.");
             }
 
-            await _diskRepository.DeleteDiskAsync(id);
+            await _diskService.DeleteDiskAsync(id);
 
             return NoContent();
         }

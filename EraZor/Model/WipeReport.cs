@@ -41,8 +41,7 @@ namespace EraZor.Model
         public string WipeMethodName { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Overwrite passes must be greater than 0.")]
-        public int OverwritePasses { get; set; }
+        public int OverwritePass { get; set; }
 
         [Required]
         [StringLength(50, ErrorMessage = "Performed by cannot exceed 50 characters.")]

@@ -1,11 +1,10 @@
 ﻿using EraZor.Data;
-using EraZor.Interfaces;
+
 using EraZor.Model;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace EraZor.Repositories
+
+namespace EraZor.Interfaces
 {
     public class DiskService : IDiskService
     {
@@ -41,5 +40,11 @@ namespace EraZor.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> DiskExistsAsync(int id)
+        {
+            return await _context.Disks.AnyAsync(d => d.DiskID == id);
+        }
     }
+
 }

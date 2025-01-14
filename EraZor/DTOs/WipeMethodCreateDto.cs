@@ -1,4 +1,6 @@
-﻿namespace EraZor.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EraZor.DTO
 {
     public class WipeMethodCreateDto
     {
@@ -6,7 +8,9 @@
         public required string Name { get; set; }
 
         /// Antallet af overskrivningspasser.
-        public int OverwritePass { get; set; }
+
+        [Required(ErrorMessage = "OverWritePasses is required.")]
+        public int OverwritePasses { get; set; }
 
         /// Beskrivelse af slette-metoden.
         public required string Description { get; set; }

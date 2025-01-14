@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using EraZor.Model;
+﻿using EraZor.Model;
 
 namespace EraZor.Interfaces
 {
@@ -10,5 +8,6 @@ namespace EraZor.Interfaces
         Task<Disk?> GetDiskByIdAsync(int id);
         Task AddDiskAsync(Disk disk);
         Task DeleteDiskAsync(int id);
+        Task<bool> DiskExistsAsync(int id);  // Tilføj denne metode som asynkron
     }
 }

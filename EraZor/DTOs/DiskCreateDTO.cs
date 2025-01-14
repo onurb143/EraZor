@@ -8,7 +8,7 @@ namespace EraZor.DTOs
         /// Diskens type. Kræves og kan ikke overstige 50 tegn.
         [Required(ErrorMessage = "Type is required.")]
         [StringLength(50, ErrorMessage = "Type cannot exceed 50 characters.")]
-        public required string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         /// Diskens kapacitet i GB. Skal være større end 0.
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0.")]
@@ -17,16 +17,16 @@ namespace EraZor.DTOs
         /// Diskens filsti. Maksimal længde er 8 tegn.
         [Required(ErrorMessage = "Path is required.")]
         [MaxLength(8, ErrorMessage = "Path cannot exceed 8 characters.")]
-        public required string Path { get; set; }
+        public string Path { get; set; } = string.Empty;
 
         /// Diskens serienummer. Kræves og kan ikke overstige 18 tegn.
         [Required(ErrorMessage = "Serial number is required.")]
         [MaxLength(18, ErrorMessage = "Serial number cannot exceed 18 characters.")]
-        public required string SerialNumber { get; set; }
+        public string SerialNumber { get; set; } = string.Empty;
 
         /// Diskens producent. Maksimal længde er 24 tegn.
         [Required(ErrorMessage = "Manufacturer is required.")]
         [MaxLength(24, ErrorMessage = "Manufacturer cannot exceed 24 characters.")]
-        public required string Manufacturer { get; set; }
+        public string Manufacturer { get; set; } = string.Empty;
     }
 }
