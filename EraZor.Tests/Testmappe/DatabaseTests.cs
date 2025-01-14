@@ -8,9 +8,9 @@ public class DatabaseTests
     [Fact]
     public void CanConnectToDockerDatabase()
     {
-        // Brug din Docker PostgreSQL-database
+        // Forbindelse til Docker PostgreSQL-database
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseNpgsql("Host=localhost;Port=5432;Database=DatamatikerDB;Username=postgres;Password=Test1234!")
+            .UseNpgsql("Host=localhost;Port=5432;Database=DatamatikerDB;Username=postgres;Password=Test12342!")
             .Options;
 
         using (var context = new DataContext(options))

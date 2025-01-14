@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   api:
@@ -5,15 +6,27 @@ services:
       context: ./EraZor/EraZor
       dockerfile: Dockerfile
     ports:
+      - "5000:5000"
       - "5002:5002"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: "http://+:5002"
-      DOTNET_RUNNING_IN_CONTAINER: "true"
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000;https://+:5002
+      - DOTNET_RUNNING_IN_CONTAINER=true
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=DatamatikerDB;Username=postgres;Password=Test1234!
+      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://+:5002
+      - ASPNETCORE_Kestrel__Endpoints__Https__Certificate__Path=/app/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Endpoints__Https__Certificate__Password=Test1234!
+      - TZ=Europe/Copenhagen
     volumes:
-      - ./Logs:/app/logs
+      - https-cert:/app/https
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    command: >
+      sh -c "dotnet ef database update &&
+             dotnet EraZor.dll"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -22,12 +35,23 @@ services:
       context: ./WebKlient/WebKlient
       dockerfile: Dockerfile
     ports:
-      - "5189:5189"
+      - "5189:5189" # Webklient HTTP-port
+      - "5199:5199" # Webklient HTTPS-port
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: "http://+:5189"
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5189;https://+:5199
+      - DOTNET_RUNNING_IN_CONTAINER=true
+      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://+:5199
+      - ASPNETCORE_Kestrel__Endpoints__Https__Certificate__Path=/app/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Endpoints__Https__Certificate__Password=Test1234!
+      - TZ=Europe/Copenhagen
+    volumes:
+      - https-cert:/app/https
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - api
+      api:
+        condition: service_started
     networks:
       - app-network
 
@@ -44,6 +68,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   app-network:
@@ -51,4 +80,10 @@ networks:
 
 volumes:
   postgres_data:
-    external: true
+    driver: local
+  https-cert:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./https
