@@ -1,8 +1,8 @@
-# Stage 1: Build
+ï»¿# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
-# Kopier csproj og gendan afhængigheder
+# Kopier csproj og gendan afhï¿½ngigheder
 COPY EraZor.csproj .
 RUN dotnet restore EraZor.csproj
 
@@ -10,7 +10,7 @@ RUN dotnet restore EraZor.csproj
 COPY . .
 RUN dotnet publish -c Release -o /publish --property:GenerateStaticWebAssets=true
 
-# Stage 2: Runtime (inkluderer værktøjer og SDK)
+# Stage 2: Runtime (inkluderer vï¿½rktï¿½jer og SDK)
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS runtime
 WORKDIR /app
 
@@ -21,10 +21,10 @@ COPY --from=build /publish .
 COPY https/aspnetapp.pfx /app/https/
 
 
-# Kopier projektfilerne for EF-kommandosupport - kun til udvikling da det bruges til at holde databasen up-to-date , in real life vil man køre migrations igennem CI/CD pipeline
+# Kopier projektfilerne for EF-kommandosupport - kun til udvikling da det bruges til at holde databasen up-to-date , in real life vil man kï¿½re migrations igennem CI/CD pipeline
 COPY EraZor.csproj .
 
-# Installer netværksværktøjer og dotnet-ef
+# Installer netvï¿½rksvï¿½rktï¿½jer og dotnet-ef
 RUN apt-get update && apt-get install -y iputils-ping && \
     dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"

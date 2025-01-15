@@ -3,14 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{085EE9AB-1272-4F34-8898-070F6CF528F9}"
-	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\ci-cd-pipeline.yml = ..\.github\workflows\ci-cd-pipeline.yml
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EraZor", "EraZor\EraZor.csproj", "{A4582C11-AD26-4B84-913D-00A60AE71EC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EraZor", "EraZor.csproj", "{83784DB0-D077-48CF-B691-7CF10F3C0D7C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebKlient", "..\WebKlient\WebKlient\WebKlient.csproj", "{C2DDCEE2-5940-4AB6-85FA-416692660ACD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebKlient", "..\WebKlient\WebKlient\WebKlient.csproj", "{D0E3D52D-3AB5-45B5-87F4-1837BCFC6153}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,19 +13,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{83784DB0-D077-48CF-B691-7CF10F3C0D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83784DB0-D077-48CF-B691-7CF10F3C0D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83784DB0-D077-48CF-B691-7CF10F3C0D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83784DB0-D077-48CF-B691-7CF10F3C0D7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2DDCEE2-5940-4AB6-85FA-416692660ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2DDCEE2-5940-4AB6-85FA-416692660ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2DDCEE2-5940-4AB6-85FA-416692660ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2DDCEE2-5940-4AB6-85FA-416692660ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4582C11-AD26-4B84-913D-00A60AE71EC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4582C11-AD26-4B84-913D-00A60AE71EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4582C11-AD26-4B84-913D-00A60AE71EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4582C11-AD26-4B84-913D-00A60AE71EC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0E3D52D-3AB5-45B5-87F4-1837BCFC6153}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0E3D52D-3AB5-45B5-87F4-1837BCFC6153}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0E3D52D-3AB5-45B5-87F4-1837BCFC6153}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0E3D52D-3AB5-45B5-87F4-1837BCFC6153}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C25E21AB-73E2-4B4C-92D0-683D7789FB36}
 	EndGlobalSection
 EndGlobal

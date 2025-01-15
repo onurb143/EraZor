@@ -5,6 +5,12 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="EraZor\**" />
+	  <Content Remove="EraZor\**" />
+	  <EmbeddedResource Remove="EraZor\**" />
+	  <None Remove="EraZor\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
@@ -26,7 +32,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="EraZor\" />
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
