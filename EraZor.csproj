@@ -16,17 +16,18 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
+		<PackageReference Include="Moq" Version="4.20.72" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Npgsql" Version="9.0.2" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
+		<PackageReference Include="xunit.extensibility.core" Version="2.9.2" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="EraZor\" />
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\WebKlient\WebKlient\WebKlient.csproj" />
-	</ItemGroup>
 </Project>
