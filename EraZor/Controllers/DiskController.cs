@@ -48,7 +48,7 @@ namespace EraZor.Controllers
 
             if (disk == null)
             {
-                return NotFound($"Disk med ID {id} blev ikke fundet.");
+                return NotFound($"Disk med ID {id} blev ikke fundet!");
             }
 
             var diskDto = new DiskReadDto
