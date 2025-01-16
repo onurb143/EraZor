@@ -44,7 +44,7 @@ namespace WebKlient.Controllers
                 Expires = expirationTime
             });
 
-            return Ok(new AuthResponse { Message = "Login successful", Token = token });
+            return Ok(new AuthResponse { Message = "Login successful!", Token = token });
         }
 
 
