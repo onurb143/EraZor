@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EraZor.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250112100844_improvements")]
-    partial class improvements
+    [Migration("20250116071516_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,84 +93,84 @@ namespace EraZor.Migrations
                         new
                         {
                             WipeMethodID = 1,
-                            Description = "Standard DoD-sletning med 3 gennemløb. Ikke ISO-certificeret.",
+                            Description = "Sikker metode, der udføres på hardware-niveau via SSD-controlleren. Ideel til SSD'er og NVMe. Ikke ISO-certificeret.",
                             Name = "Secure Erase",
-                            OverwritePass = 3
+                            OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 2,
-                            Description = "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.",
+                            Description = "Overskriver med nulværdier i ét gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er pga. wear leveling. Ikke ISO-certificeret.",
                             Name = "Zero Fill",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 3,
-                            Description = "Skriver tilfældige data i ét gennemløb. Ikke ISO-certificeret.",
+                            Description = "Overskriver med tilfældige data i ét gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er. Ikke ISO-certificeret.",
                             Name = "Random Fill",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 4,
-                            Description = "Meget sikker metode med 35 gennemløb. Ikke ISO-certificeret.",
+                            Description = "Avanceret metode med 35 gennemløb designet til ældre HDD'er. Ikke egnet til moderne HDD'er, SSD'er eller NVMe. Ikke ISO-certificeret.",
                             Name = "Gutmann Method",
                             OverwritePass = 35
                         },
                         new
                         {
                             WipeMethodID = 5,
-                            Description = "Skriver tilfældige data i 3 gennemløb. Ikke ISO-certificeret.",
+                            Description = "Overskriver med tilfældige data i 3 gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er. Ikke ISO-certificeret.",
                             Name = "Random Data",
                             OverwritePass = 3
                         },
                         new
                         {
                             WipeMethodID = 6,
-                            Description = "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.",
+                            Description = "Skriver nulværdier i ét gennemløb. God til HDD'er, mindre effektiv på SSD'er. Ikke ISO-certificeret.",
                             Name = "Write Zero",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 7,
-                            Description = "Sikker metode med 7 gennemløb. Ikke ISO-certificeret.",
+                            Description = "Metode med 7 gennemløb, som er sikker og velegnet til HDD'er. Overkill for SSD'er og NVMe. Ikke ISO-certificeret.",
                             Name = "Schneier Method",
                             OverwritePass = 7
                         },
                         new
                         {
                             WipeMethodID = 8,
-                            Description = "Sletning med 3 gennemløb efter britisk standard. Ikke ISO-certificeret.",
+                            Description = "Standardiseret metode med 3 gennemløb. Velegnet til HDD'er. Ikke egnet til SSD'er eller NVMe. Ikke ISO-certificeret.",
                             Name = "HMG IS5 (Enhanced)",
                             OverwritePass = 3
                         },
                         new
                         {
                             WipeMethodID = 9,
-                            Description = "Ekstremt sikker metode med 35 gennemløb. Ikke ISO-certificeret.",
+                            Description = "Ekstremt sikker metode med 35 gennemløb, designet til ældre HDD'er. Ikke egnet til SSD'er eller NVMe. Ikke ISO-certificeret.",
                             Name = "Peter Gutmann's Method",
                             OverwritePass = 35
                         },
                         new
                         {
                             WipeMethodID = 10,
-                            Description = "Hurtig sletning med ét gennemløb af nulværdier. Ikke ISO-certificeret.",
+                            Description = "Hurtig metode med ét gennemløb af nulværdier. Velegnet til HDD'er, men mindre effektiv for SSD'er pga. wear leveling. Ikke ISO-certificeret.",
                             Name = "Single Pass Zeroing",
                             OverwritePass = 1
                         },
                         new
                         {
                             WipeMethodID = 11,
-                            Description = "Forbedret DoD-sletning med 4 gennemløb. Ikke ISO-certificeret.",
+                            Description = "DoD-standard med 4 gennemløb. Velegnet til HDD'er, mindre relevant for SSD'er. Ikke ISO-certificeret.",
                             Name = "DoD 5220.22-M (E)",
                             OverwritePass = 4
                         },
                         new
                         {
                             WipeMethodID = 12,
-                            Description = "ISO-standard med ét gennemløb af nulværdier. ISO-certificeret.",
+                            Description = "ISO-standardiseret metode med ét gennemløb af nulværdier. Ideel til SSD'er, NVMe og HDD'er. ISO-certificeret.",
                             Name = "ISO/IEC 27040",
                             OverwritePass = 1
                         });
@@ -194,7 +194,7 @@ namespace EraZor.Migrations
                         .HasMaxLength(24)
                         .HasColumnType("character varying(24)");
 
-                    b.Property<int>("OverwritePasses")
+                    b.Property<int>("OverwritePass")
                         .HasColumnType("integer");
 
                     b.Property<string>("PerformedBy")

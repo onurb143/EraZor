@@ -191,7 +191,7 @@ namespace EraZor.Migrations
                         .HasMaxLength(24)
                         .HasColumnType("character varying(24)");
 
-                    b.Property<int>("OverwritePasses")
+                    b.Property<int>("OverwritePass")
                         .HasColumnType("integer");
 
                     b.Property<string>("PerformedBy")

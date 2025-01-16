@@ -1,41 +1,62 @@
-﻿using EraZor.Interfaces;
+﻿using Erazor.DTOs;
+using EraZor.Interfaces;
 using EraZor.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("api/[controller]")]
-public class WipeMethodsController : ControllerBase
+namespace Erazor.Controllers
 {
-    private readonly IWipeMethodService _wipeMethodService;
-
-    // Dependency Injection for IWipeMethodService
-    public WipeMethodsController(IWipeMethodService wipeMethodService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class WipeMethodsController : ControllerBase
     {
-        _wipeMethodService = wipeMethodService;
-    }
+        private readonly IWipeMethodService _wipeMethodService;
 
-    // GET: api/WipeMethods - Henter alle slettemetoder
-    [Authorize]
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<WipeMethod>>> GetWipeMethods()
-    {
-        var wipeMethods = await _wipeMethodService.GetAllWipeMethodsAsync();
-        return Ok(wipeMethods);
-    }
-
-    // DELETE: api/WipeMethods/5 - Sletter en slettemetode baseret på ID
-    [Authorize]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteWipeMethod(int id)
-    {
-        var wipeMethod = await _wipeMethodService.GetWipeMethodByIdAsync(id);
-        if (wipeMethod == null)
+        // Dependency Injection for IWipeMethodService
+        public WipeMethodsController(IWipeMethodService wipeMethodService)
         {
-            return NotFound();
+            _wipeMethodService = wipeMethodService;
         }
 
-        await _wipeMethodService.DeleteWipeMethodAsync(id);
-        return NoContent();
+        // GET: api/WipeMethods - Henter alle slettemetoder
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<WipeMethod>>> GetWipeMethods()
+        {
+            try
+            {
+                var wipeMethods = await _wipeMethodService.GetAllWipeMethodsAsync();
+                return Ok(wipeMethods);
+            }
+            catch (Exception ex)
+            {
+                // Håndterer eventuelle fejl i service kaldet
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // DELETE: api/WipeMethods/5 - Sletter en slettemetode baseret på ID
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteWipeMethod(int id)
+        {
+            try
+            {
+                var wipeMethod = await _wipeMethodService.GetWipeMethodByIdAsync(id);
+                if (wipeMethod == null)
+                {
+                    return NotFound(new { Message = "Wipe method not found" });
+                }
+
+                await _wipeMethodService.DeleteWipeMethodAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }
+

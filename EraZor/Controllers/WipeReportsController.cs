@@ -3,6 +3,7 @@ using EraZor.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using EraZor.Model;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,16 +30,29 @@ public class WipeReportsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateWipeReport([FromBody] WipeReportCreateDto dto)
     {
-        if (dto == null) return BadRequest("Invalid data.");
+        Console.WriteLine($"User: {User}");
+        Console.WriteLine($"UserManager.GetUserAsync: {await _userManager.GetUserAsync(User)}");
 
         var user = await _userManager.GetUserAsync(User);
-        if (user == null) return Unauthorized();
+        if (user == null)
+        {
+            return Unauthorized(new ApiResponse { Message = "User not found." });
+        }
 
-        var success = await _wipeReportService.CreateWipeReportAsync(dto, user.Id);
-        if (!success) return BadRequest("Failed to create wipe report.");
+        var isSuccess = await _wipeReportService.CreateWipeReportAsync(dto, user.Id);
+        if (!isSuccess)
+        {
+            return BadRequest(new ApiResponse { Message = "Failed to create wipe report." });
 
-        return Ok(new { message = "Wipe report created successfully." });
+        }
+
+
+        return Ok(new ApiResponse { Message = "Wipe report created successfully." });
     }
+
+
+
+
 
     [Authorize]
     [HttpDelete("{id}")]

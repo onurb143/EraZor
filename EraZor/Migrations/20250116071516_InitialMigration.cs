@@ -77,8 +77,8 @@ namespace EraZor.Migrations
                     WipeMethodID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    OverwritePass = table.Column<int>(type: "integer", nullable: false)
+                    OverwritePass = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,10 +199,10 @@ namespace EraZor.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     DiskId = table.Column<int>(type: "integer", nullable: false),
                     WipeMethodId = table.Column<int>(type: "integer", nullable: false),
-                    PerformedByUserId = table.Column<string>(type: "text", nullable: true)
+                    PerformedByUserId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -232,18 +232,18 @@ namespace EraZor.Migrations
                 columns: new[] { "WipeMethodID", "Description", "Name", "OverwritePass" },
                 values: new object[,]
                 {
-                    { 1, "Standard DoD-sletning med 3 gennemløb. Ikke ISO-certificeret.", "Secure Erase", 3 },
-                    { 2, "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.", "Zero Fill", 1 },
-                    { 3, "Skriver tilfældige data i ét gennemløb. Ikke ISO-certificeret.", "Random Fill", 1 },
-                    { 4, "Meget sikker metode med 35 gennemløb. Ikke ISO-certificeret.", "Gutmann Method", 35 },
-                    { 5, "Skriver tilfældige data i 3 gennemløb. Ikke ISO-certificeret.", "Random Data", 3 },
-                    { 6, "Skriver nulværdier i ét gennemløb. Ikke ISO-certificeret.", "Write Zero", 1 },
-                    { 7, "Sikker metode med 7 gennemløb. Ikke ISO-certificeret.", "Schneier Method", 7 },
-                    { 8, "Sletning med 3 gennemløb efter britisk standard. Ikke ISO-certificeret.", "HMG IS5 (Enhanced)", 3 },
-                    { 9, "Ekstremt sikker metode med 35 gennemløb. Ikke ISO-certificeret.", "Peter Gutmann's Method", 35 },
-                    { 10, "Hurtig sletning med ét gennemløb af nulværdier. Ikke ISO-certificeret.", "Single Pass Zeroing", 1 },
-                    { 11, "Forbedret DoD-sletning med 4 gennemløb. Ikke ISO-certificeret.", "DoD 5220.22-M (E)", 4 },
-                    { 12, "ISO-standard med ét gennemløb af nulværdier. ISO-certificeret.", "ISO/IEC 27040", 1 }
+                    { 1, "Sikker metode, der udføres på hardware-niveau via SSD-controlleren. Ideel til SSD'er og NVMe. Ikke ISO-certificeret.", "Secure Erase", 1 },
+                    { 2, "Overskriver med nulværdier i ét gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er pga. wear leveling. Ikke ISO-certificeret.", "Zero Fill", 1 },
+                    { 3, "Overskriver med tilfældige data i ét gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er. Ikke ISO-certificeret.", "Random Fill", 1 },
+                    { 4, "Avanceret metode med 35 gennemløb designet til ældre HDD'er. Ikke egnet til moderne HDD'er, SSD'er eller NVMe. Ikke ISO-certificeret.", "Gutmann Method", 35 },
+                    { 5, "Overskriver med tilfældige data i 3 gennemløb. Velegnet til HDD'er, mindre egnet til SSD'er. Ikke ISO-certificeret.", "Random Data", 3 },
+                    { 6, "Skriver nulværdier i ét gennemløb. God til HDD'er, mindre effektiv på SSD'er. Ikke ISO-certificeret.", "Write Zero", 1 },
+                    { 7, "Metode med 7 gennemløb, som er sikker og velegnet til HDD'er. Overkill for SSD'er og NVMe. Ikke ISO-certificeret.", "Schneier Method", 7 },
+                    { 8, "Standardiseret metode med 3 gennemløb. Velegnet til HDD'er. Ikke egnet til SSD'er eller NVMe. Ikke ISO-certificeret.", "HMG IS5 (Enhanced)", 3 },
+                    { 9, "Ekstremt sikker metode med 35 gennemløb, designet til ældre HDD'er. Ikke egnet til SSD'er eller NVMe. Ikke ISO-certificeret.", "Peter Gutmann's Method", 35 },
+                    { 10, "Hurtig metode med ét gennemløb af nulværdier. Velegnet til HDD'er, men mindre effektiv for SSD'er pga. wear leveling. Ikke ISO-certificeret.", "Single Pass Zeroing", 1 },
+                    { 11, "DoD-standard med 4 gennemløb. Velegnet til HDD'er, mindre relevant for SSD'er. Ikke ISO-certificeret.", "DoD 5220.22-M (E)", 4 },
+                    { 12, "ISO-standardiseret metode med ét gennemløb af nulværdier. Ideel til SSD'er, NVMe og HDD'er. ISO-certificeret.", "ISO/IEC 27040", 1 }
                 });
 
             migrationBuilder.CreateIndex(

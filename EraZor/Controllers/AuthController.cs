@@ -1,6 +1,7 @@
 ﻿using EraZor.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Erazor.DTOs;
+using EraZor.Model;
 
 namespace WebKlient.Controllers
 {
@@ -20,20 +21,21 @@ namespace WebKlient.Controllers
         {
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
-                return BadRequest(new { message = "Email and password are required." });
+                Console.WriteLine("Model is null or email/password is empty.");
+                return BadRequest(new AuthResponse { Message = "Email and password are required." });
             }
 
             var user = await _authService.LoginAsync(model.Email, model.Password);
             if (user == null)
             {
-                return Unauthorized(new { message = "Invalid credentials" });
+                Console.WriteLine("User is null.");
+                return Unauthorized(new AuthResponse { Message = "Invalid credentials" });
             }
 
             var token = await _authService.GenerateJwtToken(user);
+            Console.WriteLine($"Generated token: {token}");
 
-
-            // Sæt cookie-udløbstiden til 2 timer fra nu
-            var expirationTime = DateTime.UtcNow.AddHours(2); // Udløber om 2 timer
+            var expirationTime = DateTime.UtcNow.AddHours(2);
             Response.Cookies.Append("jwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
@@ -42,8 +44,11 @@ namespace WebKlient.Controllers
                 Expires = expirationTime
             });
 
-            return Ok(new { message = "Login successful", token });
+            return Ok(new AuthResponse { Message = "Login successful", Token = token });
         }
+
+
+
 
 
 

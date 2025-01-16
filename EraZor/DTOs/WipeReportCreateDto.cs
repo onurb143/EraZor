@@ -11,25 +11,33 @@ namespace EraZor.DTO
         public DateTime EndTime { get; set; }
 
         [Required(ErrorMessage = "Status is required.")]
-        public required string Status { get; set; }
+        public string? Status { get; set; }
 
         [Required(ErrorMessage = "Serial number is required.")]
         [MaxLength(18, ErrorMessage = "Serial number cannot exceed 18 characters.")]
-        public required string SerialNumber { get; set; }
+        public string? SerialNumber { get; set; }
 
         [MaxLength(24, ErrorMessage = "Manufacturer cannot exceed 24 characters.")]
-        public required string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
+
+        [Required(ErrorMessage = "Disk type is required.")]
+        [MaxLength(50, ErrorMessage = "Disk type cannot exceed 50 characters.")]
+        public string? DiskType { get; set; }
+
+        [Required(ErrorMessage = "Capacity is required.")]
+        public int Capacity { get; set; } // Tilføjet Capacity
 
         [Required(ErrorMessage = "Wipe method name is required.")]
-        public required string WipeMethodName { get; set; }
+        public string? WipeMethodName { get; set; }
 
-        [Required(ErrorMessage = "OverWritePasses is required.")]
+        [Required(ErrorMessage = "Overwrite passes are required.")]
         public int OverwritePasses { get; set; }
 
         [Required(ErrorMessage = "Performed by is required.")]
-        public required string PerformedBy { get; set; }
+        public string? PerformedBy { get; set; }
     }
 }
+
 
 
 

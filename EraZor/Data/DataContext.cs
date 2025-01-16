@@ -11,13 +11,13 @@ public class DataContext : IdentityDbContext<IdentityUser>
 
     // Kortlægning af modeller til databasetabeller
     public DbSet<WipeJob> WipeJobs { get; set; }
-    public DbSet<Disk> Disks { get; set; }
-    public DbSet<WipeMethod> WipeMethods { get; set; }
+    public virtual DbSet<Disk> Disks { get; set; }
+    public virtual DbSet<WipeMethod> WipeMethods { get; set; }
 
     // WipeReport er et view, derfor er det også kortlagt som en DbSet
     public DbSet<WipeReport> WipeReports { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+   protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
